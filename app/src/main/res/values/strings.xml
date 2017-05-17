@@ -15,12 +15,13 @@
 
     <!-- Error Handling Strings-->
     <string name="authorization_error">Wystąpił błąd podczas autoryzacji. Spróbuj później</string>
+    <string name="server_connection_error">Brak połączenia z serwerem. Spróbuj później</string>
+    <string name="network_connection_error">Brak dostępu do internetu</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -29,4 +30,13 @@
         completions."
     </string>
     <string name="title_activity_register">Sign up</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="action_example">Example action</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_close">Close</string>
+    <string name="action_sign_out">Sign out</string>
 </resources>

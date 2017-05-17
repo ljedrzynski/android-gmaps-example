@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "pl.devone.ipark"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -32,5 +32,6 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile group: 'com.google.guava', name: 'guava', version: '22.0-rc1-android'
+    compile 'com.android.support:design:25.3.1'
     testCompile 'junit:junit:4.12'
 }

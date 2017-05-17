@@ -2,10 +2,9 @@ package pl.devone.ipark.authentication;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.common.base.Strings;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -20,9 +19,10 @@ import java.util.HashMap;
 import cz.msebera.android.httpclient.Header;
 import pl.devone.ipark.LoginActivity;
 import pl.devone.ipark.R;
+import pl.devone.ipark.authentication.callback.AuthTaskCallback;
 import pl.devone.ipark.http.RestClient;
 import pl.devone.ipark.task.AsyncTaskCallback;
-import pl.devone.ipark.util.ActivityUtils;
+import pl.devone.ipark.utils.ActivityUtils;
 
 /**
  * Created by ljedrzynski on 17.05.2017.
@@ -30,7 +30,7 @@ import pl.devone.ipark.util.ActivityUtils;
 
 public class AuthenticationManager {
 
-    public static void signIn(final String email, final String password, final AsyncTaskCallback callback, final Context context) {
+    public static void signIn(final String email, final String password, final AuthTaskCallback callback, final Context context) {
         RestClient.post(getAbsoluteUrl(context, "/authenticate"), new RequestParams(new HashMap<String, String>() {{
             put("email", email);
             put("password", password);
@@ -49,8 +49,11 @@ public class AuthenticationManager {
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String res, Throwable t) {
-                callback.onFailure();
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                if (statusCode == 401) {
+                    callback.onFailure();
+                } else
+                    callback.onError(context.getString(R.string.server_connection_error) + "(" + statusCode + ")");
             }
         });
     }

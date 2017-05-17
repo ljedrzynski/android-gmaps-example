@@ -9,4 +9,5 @@ public interface AsyncTaskCallback {
     void onSuccess();
 
     void onFailure();
+
 }

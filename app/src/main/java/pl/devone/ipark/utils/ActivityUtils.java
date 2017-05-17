@@ -1,4 +1,4 @@
-package pl.devone.ipark.util;
+package pl.devone.ipark.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
