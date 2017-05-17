@@ -59,10 +59,13 @@ public class MainActivity extends Activity
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
+                mTitle = getString(R.string.title_main);
+                break;
+            case 2:
                 mTitle = getString(R.string.action_sign_out);
                 AuthenticationManager.signOut(this);
                 break;
-            case 2:
+            case 3:
                 mTitle = getString(R.string.action_close);
                 break;
         }
@@ -82,15 +85,15 @@ public class MainActivity extends Activity
     }
 
     private void onCreateCheck() {
-        if(!ConnectionUtils.isOnline(getApplicationContext())) {
+        if (!ConnectionUtils.isOnline(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), getString(R.string.network_connection_error), Toast.LENGTH_LONG).show();
             navigateLoginActivity();
         }
-
-        if (!ConnectionUtils.isServerReachable(getString(R.string.api))) {
-            Toast.makeText(getApplicationContext(), getString(R.string.server_connection_error), Toast.LENGTH_LONG).show();
-            navigateLoginActivity();
-        }
+//
+//        if (!ConnectionUtils.isServerReachable(getString(R.string.api))) {
+//            Toast.makeText(getApplicationContext(), getString(R.string.server_connection_error), Toast.LENGTH_LONG).show();
+//            navigateLoginActivity();
+//        }
 
         if (!AuthenticationManager.isAppAuthenticated(getApplicationContext())) {
             Intent intent = new Intent(this, LoginActivity.class);
