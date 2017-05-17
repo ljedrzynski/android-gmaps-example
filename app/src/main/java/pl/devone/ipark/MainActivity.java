@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.Toast;
 
 import pl.devone.ipark.authentication.AuthenticationManager;
 import pl.devone.ipark.http.utils.ConnectionUtils;
+import pl.devone.ipark.utils.ActivityUtils;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -79,9 +79,7 @@ public class MainActivity extends Activity
     }
 
     private void navigateLoginActivity() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
+        ActivityUtils.navigateActivity(this, LoginActivity.class, true);
     }
 
     private void onCreateCheck() {
@@ -96,9 +94,7 @@ public class MainActivity extends Activity
 //        }
 
         if (!AuthenticationManager.isAppAuthenticated(getApplicationContext())) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            finish();
+            navigateLoginActivity();
         }
     }
 

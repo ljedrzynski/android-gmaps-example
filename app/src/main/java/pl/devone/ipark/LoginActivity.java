@@ -34,7 +34,6 @@ import java.util.List;
 
 import pl.devone.ipark.authentication.AuthenticationManager;
 import pl.devone.ipark.authentication.callback.AuthTaskCallback;
-import pl.devone.ipark.task.AsyncTaskCallback;
 import pl.devone.ipark.utils.ActivityUtils;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -80,6 +79,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             @Override
             public void onClick(View view) {
                 attemptLogin();
+            }
+        });
+
+        Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
+        mEmailSignUpButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityUtils.navigateActivity(LoginActivity.this, RegisterActivity.class, false);
             }
         });
 
@@ -175,7 +182,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 @Override
                 public void onSuccess() {
                     showProgress(false);
-                    ActivityUtils.navigateActivity(LoginActivity.this, MainActivity.class);
+                    ActivityUtils.navigateActivity(LoginActivity.this, MainActivity.class, true);
                 }
 
                 @Override

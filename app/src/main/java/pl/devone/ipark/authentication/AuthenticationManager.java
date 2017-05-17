@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.google.common.base.Strings;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -21,7 +19,6 @@ import pl.devone.ipark.LoginActivity;
 import pl.devone.ipark.R;
 import pl.devone.ipark.authentication.callback.AuthTaskCallback;
 import pl.devone.ipark.http.RestClient;
-import pl.devone.ipark.task.AsyncTaskCallback;
 import pl.devone.ipark.utils.ActivityUtils;
 
 /**
@@ -53,24 +50,27 @@ public class AuthenticationManager {
                 if (statusCode == 401) {
                     callback.onFailure();
                 } else
-                    callback.onError(context.getString(R.string.server_connection_error) + "(" + statusCode + ")");
+                    callback.onError(context.getString(R.string.server_connection_error));
             }
         });
     }
 
-    public static boolean signUp(Context context) {
-        RestClient.post(getAbsoluteUrl(context, "/register"), null, new AsyncHttpResponseHandler() {
+    public static void signUp(final String nickName, final String email, final String password, final AuthTaskCallback callback, final Context context) {
+        RestClient.post(getAbsoluteUrl(context, "/register"), new RequestParams(new HashMap<String, String>() {{
+            put("nick", nickName);
+            put("email", email);
+            put("password", password);
+        }}), new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                callback.onSuccess();
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                callback.onFailure();
             }
         });
-        return true;
     }
 
     public static void signOut(Activity currentActivity) {
@@ -78,7 +78,7 @@ public class AuthenticationManager {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.remove(context.getString(R.string.authorization_token));
         editor.apply();
-        ActivityUtils.navigateActivity(currentActivity, LoginActivity.class);
+        ActivityUtils.navigateActivity(currentActivity, LoginActivity.class, true);
     }
 
     public static boolean isAppAuthenticated(Context context) {
