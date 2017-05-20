@@ -13,10 +13,18 @@
     <string name="authorization_credentials_fail">Błąd logowania. Proszę spróbować ponownie</string>
 
 
-    <!-- Error Handling Strings-->
-    <string name="authorization_error">Wystąpił błąd podczas autoryzacji. Spróbuj później</string>
+    <!-- Error Strings-->
+    <string name="authorization_error">Wystąpił błąd podczas autoryzacji. Spróbuj ponownie</string>
     <string name="server_connection_error">Brak połączenia z serwerem. Spróbuj później</string>
     <string name="network_connection_error">Brak dostępu do internetu</string>
+    <string name="error_invalid_email">Błędny format email</string>
+    <string name="error_invalid_nick">Nick jest za krótki</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_password_confirmation">Hasła się różnią</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">Pole jest wymagane!</string>
+    <string name="error_location_permission_denied">Brak pozwolenia na wykorzystanie położenia!</string>
+
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -24,12 +32,10 @@
     <string name="prompt_password">Password</string>
     <string name="prompt_confirm_password">Confirm Password</string>
 
-    <string name="error_invalid_email">Błędny format email</string>
-    <string name="error_invalid_nick">Nick jest za krótki</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_password_confirmation">Hasła się różnią</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">Pole jest wymagane!</string>
+    <!--Permission Strigns-->
+    <string name="title_location_permission">Zgoda na dostęp do położenia</string>
+    <string name="info_location_permission">Aplikacja wymaga dostępu do położenia</string>
+
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
