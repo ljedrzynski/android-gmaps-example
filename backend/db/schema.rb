@@ -10,7 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170516080342) do
+ActiveRecord::Schema.define(version: 20170521202628) do
+
+  create_table "parking_spaces", force: :cascade do |t|
+    t.decimal "latitude", precision: 15, scale: 10
+    t.decimal "longitude", precision: 15, scale: 10
+    t.boolean "occupied"
+    t.integer "curr_occupier_id"
+    t.integer "last_occupier_id"
+    t.integer "reporter_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["curr_occupier_id"], name: "index_parking_spaces_on_curr_occupier_id"
+    t.index ["last_occupier_id"], name: "index_parking_spaces_on_last_occupier_id"
+    t.index ["reporter_id"], name: "index_parking_spaces_on_reporter_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "nick"

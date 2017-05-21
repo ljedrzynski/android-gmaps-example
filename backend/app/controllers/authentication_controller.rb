@@ -14,7 +14,7 @@ class AuthenticationController < ApplicationController
   def register
     @user = User.create(nick: params[:nick], email: params[:email], password: params[:password])
     if @user.save
-      render json: {user: @user}, status: :ok;
+      render json: {user_id: @user.id}, status: :ok;
     else
       render json: {error: @user.errors}, status: :not_acceptable;
     end
