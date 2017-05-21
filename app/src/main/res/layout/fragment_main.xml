@@ -4,15 +4,20 @@
     android:layout_height="match_parent"
     tools:context="pl.devone.ipark.MainFragment">
 
-
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/map"
+    <fragment
+        android:id="@+id/fragment_map"
+        android:name="pl.devone.ipark.MapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_map">
 
-    <FrameLayout
-        android:id="@+id/view_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/view_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </fragment>
 
 </RelativeLayout>

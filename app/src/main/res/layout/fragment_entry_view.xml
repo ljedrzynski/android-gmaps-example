@@ -25,7 +25,9 @@
             android:layout_height="wrap_content"
             android:text="@string/action_leave_spot"
             android:textStyle="bold" />
+
     </LinearLayout>
+
 </RelativeLayout>
 
 
