@@ -4,6 +4,7 @@ package pl.devone.ipark;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -41,6 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MainFragment extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
+        EntryViewFragment.EntryViewActionCallbacks,
         LocationListener {
 
     private GoogleMap mMap;
@@ -56,17 +59,30 @@ public class MainFragment extends Fragment implements OnMapReadyCallback,
     public MainFragment() {
     }
 
+    private void setView(Fragment fragment) {
+        getChildFragmentManager()
+                .beginTransaction()
+                .replace(R.id.view_container, fragment)
+                .commit();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setView(new EntryViewFragment());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.fragment_main, container, false);
+        return mView;
     }
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
                 new AlertDialog.Builder(getContext())
                         .setTitle(getString(R.string.title_location_permission))
                         .setMessage(getString(R.string.info_location_permission))
@@ -119,14 +135,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        mView = inflater.inflate(R.layout.fragment_main, container, false);
-        return mView;
-    }
-
-    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -153,7 +161,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback,
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
             } else {
-                //Request Location Permission
                 checkLocationPermission();
             }
         } else {
@@ -189,18 +196,20 @@ public class MainFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
-
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
+        mCurrLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(latLng).zoom(16).bearing(0).tilt(45).build()));
     }
 
+    @Override
+    public void onFindSpaceAction() {
+        setView(new SearchViewFragment());
+    }
+
+    @Override
+    public void onLeaveSpaceAction() {
+    }
 }

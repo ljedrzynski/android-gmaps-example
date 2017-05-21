@@ -53,4 +53,7 @@
     <!-- Main Activity-->
     <string name="action_find_spot">Znajdź miejsce</string>
     <string name="action_leave_spot">Zwolnij miejsce</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

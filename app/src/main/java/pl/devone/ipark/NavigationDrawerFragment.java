@@ -198,6 +198,10 @@ public class NavigationDrawerFragment extends Fragment {
             mCallbacks = (NavigationDrawerCallbacks) context;
         } catch (ClassCastException e) {
             throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
+        }        try {
+            mCallbacks = (NavigationDrawerCallbacks) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
         }
     }
 

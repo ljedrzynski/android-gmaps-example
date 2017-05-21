@@ -181,20 +181,20 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             AuthenticationManager.signIn(email, password, new AuthTaskCallback() {
                 @Override
                 public void onSuccess() {
-                    showProgress(false);
                     ActivityUtils.navigateActivity(LoginActivity.this, MainActivity.class, true);
+                    showProgress(false);
                 }
 
                 @Override
                 public void onFailure() {
-                    showProgress(false);
                     Toast.makeText(LoginActivity.this.getApplicationContext(), getString(R.string.authorization_credentials_fail), Toast.LENGTH_LONG).show();
+                    showProgress(false);
                 }
 
                 @Override
                 public void onError(String error) {
-                    showProgress(false);
                     Toast.makeText(LoginActivity.this.getApplicationContext(), error, Toast.LENGTH_LONG).show();
+                    showProgress(false);
                 }
             }, this);
         }

@@ -13,11 +13,10 @@ import android.util.Log;
 public class ActivityUtils {
 
     public static void navigateActivity(Activity currentActivity, Class nextActivityClass, boolean finish) {
-        Intent intent = new Intent(currentActivity, nextActivityClass);
-        currentActivity.startActivity(intent);
         if (finish) {
             currentActivity.finish();
         }
+        currentActivity.startActivity(new Intent(currentActivity, nextActivityClass));
     }
 
     public static void reportError(String error, Context context) {

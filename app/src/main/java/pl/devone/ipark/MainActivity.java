@@ -25,19 +25,28 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
         onCreateCheck();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
+
         mTitle = getTitle();
 
-        // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    private void onCreateCheck() {
+        if (!ConnectionUtils.isOnline(getApplicationContext())) {
+            Toast.makeText(getApplicationContext(), getString(R.string.network_connection_error), Toast.LENGTH_LONG).show();
+            navigateLoginActivity();
+        }
+        if (!AuthenticationManager.isAppAuthenticated(getApplicationContext())) {
+            navigateLoginActivity();
+        }
     }
 
     @Override
@@ -69,19 +78,4 @@ public class MainActivity extends Activity
         ActivityUtils.navigateActivity(this, LoginActivity.class, true);
     }
 
-    private void onCreateCheck() {
-        if (!ConnectionUtils.isOnline(getApplicationContext())) {
-            Toast.makeText(getApplicationContext(), getString(R.string.network_connection_error), Toast.LENGTH_LONG).show();
-            navigateLoginActivity();
-        }
-//
-//        if (!ConnectionUtils.isServerReachable(getString(R.string.api))) {
-//            Toast.makeText(getApplicationContext(), getString(R.string.server_connection_error), Toast.LENGTH_LONG).show();
-//            navigateLoginActivity();
-//        }
-
-        if (!AuthenticationManager.isAppAuthenticated(getApplicationContext())) {
-            navigateLoginActivity();
-        }
-    }
 }
