@@ -34,9 +34,9 @@ import java.util.List;
 
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
-import pl.devone.ipark.services.authentication.callback.AuthTaskCallback;
+import pl.devone.ipark.services.callback.AsyncTaskCallback;
 import pl.devone.ipark.models.User;
-import pl.devone.ipark.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.ActivityHelper;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -180,7 +180,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            AuthenticationManager.signIn(this, new User(email, password), new AuthTaskCallback() {
+            AuthenticationManager.signIn(this, new User(email, password), new AsyncTaskCallback() {
                 @Override
                 public void onSuccess() {
                     ActivityHelper.navigateActivity(LoginActivity.this, MainActivity.class, true);

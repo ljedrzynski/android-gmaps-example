@@ -12,8 +12,9 @@ import pl.devone.ipark.fragments.MainFragment;
 import pl.devone.ipark.fragments.NavigationDrawerFragment;
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
+import pl.devone.ipark.services.http.RestClient;
 import pl.devone.ipark.services.http.utils.ConnectionUtils;
-import pl.devone.ipark.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.ActivityHelper;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -50,6 +51,8 @@ public class MainActivity extends Activity
         if (!AuthenticationManager.isAppAuthenticated(getApplicationContext())) {
             navigateLoginActivity();
         }
+
+        RestClient.setAuthorizationHeader(ActivityHelper.getUser(this).getAuthToken());
     }
 
     @Override
@@ -68,7 +71,7 @@ public class MainActivity extends Activity
         }
     }
 
-    private void switchFragment(Fragment fragment){
+    private void switchFragment(Fragment fragment) {
         if (fragment != null) {
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()

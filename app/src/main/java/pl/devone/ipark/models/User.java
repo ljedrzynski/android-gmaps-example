@@ -3,6 +3,7 @@ package pl.devone.ipark.models;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by ljedrzynski on 22.05.2017.
@@ -14,8 +15,8 @@ public class User implements Serializable {
     private String nick;
     private String email;
     private String password;
-    private String createdAt;
-    private String updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
 
     @SerializedName("auth_token")
     private String authToken;
@@ -23,7 +24,7 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(Long id, String nick, String email, String password, String createdAt, String updatedAt, String authToken) {
+    public User(Long id, String nick, String email, String password, Date createdAt, Date updatedAt, String authToken) {
         this.id = id;
         this.nick = nick;
         this.email = email;
@@ -76,19 +77,19 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 

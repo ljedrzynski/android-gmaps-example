@@ -27,7 +27,6 @@
     <string name="error_server_communication">Błąd komunikacji z serwerem</string>
     <string name="error_reported_info">Błąd został zgłoszony i przekazany do dalszego procesowania</string>
 
-
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_nick_name">Nick</string>

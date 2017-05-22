@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
+import pl.devone.ipark.services.http.helpers.HttpHelper;
 
 /**
  * Created by ljedrzynski on 17.05.2017.
@@ -19,12 +20,8 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 public class RestClient {
     private static AsyncHttpClient client = new AsyncHttpClient();
 
-    public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.get(url, params, responseHandler);
-    }
-
     public static void get(Context context, String url, Header[] headers, RequestParams params, ResponseHandlerInterface responseHandler) {
-        client.get(context, url, headers, params, responseHandler);
+        client.get(context, HttpHelper.getApiAbsoluteUrl(context, url), headers, params, responseHandler);
     }
 
     public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
@@ -32,7 +29,7 @@ public class RestClient {
     }
 
     public static void post(Context context, String url, String entity, ResponseHandlerInterface responseHandler) throws UnsupportedEncodingException {
-        client.post(context, url, new StringEntity(entity), "application/json", responseHandler);
+        client.post(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json", responseHandler);
     }
 
     public static void put(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
@@ -40,10 +37,14 @@ public class RestClient {
     }
 
     public static void put(Context context, String url, String entity, ResponseHandlerInterface responseHandler) throws UnsupportedEncodingException {
-        client.put(context, url, new StringEntity(entity), "application/json", responseHandler);
+        client.put(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json", responseHandler);
     }
 
     public static void delete(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         client.delete(url, params, responseHandler);
+    }
+
+    public static void setAuthorizationHeader(String token) {
+        client.addHeader("Authorization", token);
     }
 }

@@ -1,11 +1,10 @@
-package pl.devone.ipark.services.authentication.callback;
+package pl.devone.ipark.services.callback;
 
 /**
  * Created by ljedrzynski on 17.05.2017.
  */
 
-public interface AuthTaskCallback {
-
+public interface AsyncTaskCallback {
 
     void onSuccess();
 

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="api" type="string">http://10.0.2.2:3000</item>
+    <item name="api_url" type="string">http://10.0.2.2:3000</item>
+    <item name="parking_spaces_url" type="string">/api/v1/parking-spaces</item>
+
 </resources>

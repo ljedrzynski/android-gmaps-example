@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- System exception messages-->
+    <string name="error_response_without_token">No token in authentication response!</string>
+
+</resources>

@@ -1,5 +1,5 @@
 class Api::V1::ParkingSpacesController < ApplicationController
-  before_action :set_parking_space, only: [:show, :update]
+  before_action :set_parking_space, only: [:show, :update, :destroy]
 
   # GET /parking_spaces
   def index
@@ -18,7 +18,7 @@ class Api::V1::ParkingSpacesController < ApplicationController
     @parking_space = ParkingSpace.new(parking_space_params)
 
     if @parking_space.save
-      render json: @parking_space, status: :created, location: @parking_space
+      render json: @parking_space, status: :created, location:  [:api, :v1, @parking_space]
     else
       render json: @parking_space.errors, status: :unprocessable_entity
     end
@@ -47,5 +47,6 @@ class Api::V1::ParkingSpacesController < ApplicationController
   # Only allow a trusted parameter "white list" through.
   def parking_space_params
     params.fetch(:parking_space, {})
+    params.require(:parking_space).permit(:latitude, :longitude, :reporter_id)
   end
 end

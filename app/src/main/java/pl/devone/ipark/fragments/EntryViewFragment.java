@@ -40,6 +40,14 @@ public class EntryViewFragment extends Fragment {
                 mCallbacks.onFindSpaceAction();
             }
         });
+
+        Button leaveSpaceButton = (Button) view.findViewById(R.id.leave_space_button);
+        leaveSpaceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallbacks.onLeaveSpaceAction();
+            }
+        });
         return view;
     }
 
@@ -50,9 +58,7 @@ public class EntryViewFragment extends Fragment {
     }
 
     interface EntryViewActionCallbacks {
-        /**
-         * Called when an item in the navigation drawer is selected.
-         */
+
         void onFindSpaceAction();
 
         void onLeaveSpaceAction();

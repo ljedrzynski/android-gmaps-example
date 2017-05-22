@@ -194,5 +194,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         mCurrLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(latLng).zoom(16).bearing(0).tilt(45).build()));
     }
-
 }

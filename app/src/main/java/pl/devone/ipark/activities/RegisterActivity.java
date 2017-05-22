@@ -34,9 +34,9 @@ import java.util.List;
 
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
-import pl.devone.ipark.services.authentication.callback.AuthTaskCallback;
+import pl.devone.ipark.services.callback.AsyncTaskCallback;
 import pl.devone.ipark.models.User;
-import pl.devone.ipark.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.ActivityHelper;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -211,7 +211,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             focusView.requestFocus();
         } else {
             showProgress(true);
-            AuthenticationManager.signUp(this, new User(nick, email, password), new AuthTaskCallback() {
+            AuthenticationManager.signUp(this, new User(nick, email, password), new AsyncTaskCallback() {
                 @Override
                 public void onSuccess() {
                     showProgress(false);
