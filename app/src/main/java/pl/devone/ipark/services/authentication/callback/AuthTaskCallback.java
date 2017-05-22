@@ -1,4 +1,4 @@
-package pl.devone.ipark.authentication.callback;
+package pl.devone.ipark.services.authentication.callback;
 
 /**
  * Created by ljedrzynski on 17.05.2017.

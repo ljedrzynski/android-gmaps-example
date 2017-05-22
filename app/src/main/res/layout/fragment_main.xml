@@ -2,11 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pl.devone.ipark.MainFragment">
+    tools:context="pl.devone.ipark.fragments.MainFragment">
 
     <fragment
         android:id="@+id/fragment_map"
-        android:name="pl.devone.ipark.MapFragment"
+        android:name="pl.devone.ipark.fragments.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_map">

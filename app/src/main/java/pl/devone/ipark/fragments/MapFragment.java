@@ -1,4 +1,4 @@
-package pl.devone.ipark;
+package pl.devone.ipark.fragments;
 
 
 import android.Manifest;
@@ -34,6 +34,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import pl.devone.ipark.R;
 
 
 /**

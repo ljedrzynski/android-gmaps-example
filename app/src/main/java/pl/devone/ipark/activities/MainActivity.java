@@ -1,4 +1,4 @@
-package pl.devone.ipark;
+package pl.devone.ipark.activities;
 
 import android.app.Activity;
 
@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
-import pl.devone.ipark.authentication.AuthenticationManager;
-import pl.devone.ipark.http.utils.ConnectionUtils;
-import pl.devone.ipark.utils.ActivityUtils;
+import pl.devone.ipark.fragments.MainFragment;
+import pl.devone.ipark.fragments.NavigationDrawerFragment;
+import pl.devone.ipark.R;
+import pl.devone.ipark.services.authentication.AuthenticationManager;
+import pl.devone.ipark.services.http.utils.ConnectionUtils;
+import pl.devone.ipark.helpers.ActivityHelper;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -75,7 +78,7 @@ public class MainActivity extends Activity
     }
 
     private void navigateLoginActivity() {
-        ActivityUtils.navigateActivity(this, LoginActivity.class, true);
+        ActivityHelper.navigateActivity(this, LoginActivity.class, true);
     }
 
 }

@@ -1,4 +1,4 @@
-package pl.devone.ipark.http.utils;
+package pl.devone.ipark.services.http.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
