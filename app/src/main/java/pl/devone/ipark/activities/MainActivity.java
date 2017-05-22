@@ -13,7 +13,7 @@ import pl.devone.ipark.fragments.NavigationDrawerFragment;
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
 import pl.devone.ipark.services.http.RestClient;
-import pl.devone.ipark.services.http.utils.ConnectionUtils;
+import pl.devone.ipark.services.http.helpers.ConnectionHelper;
 import pl.devone.ipark.activities.helpers.ActivityHelper;
 
 public class MainActivity extends Activity
@@ -44,7 +44,7 @@ public class MainActivity extends Activity
     }
 
     private void onCreateCheck() {
-        if (!ConnectionUtils.isOnline(getApplicationContext())) {
+        if (!ConnectionHelper.isOnline(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), getString(R.string.network_connection_error), Toast.LENGTH_LONG).show();
             navigateLoginActivity();
         }

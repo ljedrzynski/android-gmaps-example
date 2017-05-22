@@ -1,4 +1,4 @@
-package pl.devone.ipark.services.http.utils;
+package pl.devone.ipark.services.http.helpers;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -10,7 +10,7 @@ import java.net.InetAddress;
  * Created by ljedrzynski on 17.05.2017.
  */
 
-public class ConnectionUtils {
+public class ConnectionHelper {
 
 
     public static boolean isServerReachable(String host) {

@@ -33,7 +33,8 @@ public class EntryViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_entry_view, container, false);
-        Button findSpaceButton = (Button) view.findViewById(R.id.find_space_button);
+
+        Button findSpaceButton = (Button) view.findViewById(R.id.search_park_space_button);
         findSpaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,13 +42,14 @@ public class EntryViewFragment extends Fragment {
             }
         });
 
-        Button leaveSpaceButton = (Button) view.findViewById(R.id.leave_space_button);
+        Button leaveSpaceButton = (Button) view.findViewById(R.id.leave_park_space_button);
         leaveSpaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCallbacks.onLeaveSpaceAction();
             }
         });
+
         return view;
     }
 

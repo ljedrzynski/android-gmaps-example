@@ -9,18 +9,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.List;
+
 import pl.devone.ipark.R;
-import pl.devone.ipark.activities.RegisterActivity;
+import pl.devone.ipark.activities.helpers.ActivityHelper;
 import pl.devone.ipark.models.ParkingSpace;
-import pl.devone.ipark.services.callback.AsyncTaskCallback;
+import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
 import pl.devone.ipark.services.parkingspace.ParkingSpaceManager;
+import pl.devone.ipark.services.parkingspace.callbacks.ParkingSpaceFetchCallback;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MainFragment extends Fragment implements
-        EntryViewFragment.EntryViewActionCallbacks {
+        EntryViewFragment.EntryViewActionCallbacks,
+        SearchViewFragment.SearchViewActionCallbacks {
 
     private View mView;
     private MapFragment mapFragment;
@@ -38,11 +42,8 @@ public class MainFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         setView(new EntryViewFragment());
-
         mView = inflater.inflate(R.layout.fragment_main, container, false);
-
         return mView;
     }
 
@@ -56,15 +57,27 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onFindSpaceAction() {
-        setView(new SearchViewFragment());
+        ParkingSpaceManager.getParkingSpaces(getContext(), mapFragment.mLastLocation, new ParkingSpaceFetchCallback() {
+            @Override
+            public void onSuccess(List<ParkingSpace> parkingSpaces) {
+                mapFragment.markFreeParkingSpaces(parkingSpaces);
+                setView(new SearchViewFragment());
+                Toast.makeText(getContext(), "Znaleziono w okolicy " + parkingSpaces.size() + (parkingSpaces.size() > 1 ? "miejsc" : "miejsce"), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
     }
 
     @Override
     public void onLeaveSpaceAction() {
-        ParkingSpaceManager.createParkingSpace(getContext(), new ParkingSpace(mapFragment.mLastLocation), new AsyncTaskCallback() {
+        ParkingSpaceManager.createParkingSpace(getContext(), new ParkingSpace(mapFragment.mLastLocation, ActivityHelper.getUser(getContext())), new AsyncTaskCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getContext(), "Zarjestrowane!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Zarejestrowane!", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -77,5 +90,10 @@ public class MainFragment extends Fragment implements
 
             }
         });
+    }
+
+    @Override
+    public void onSearchContinueAction() {
+        onFindSpaceAction();
     }
 }

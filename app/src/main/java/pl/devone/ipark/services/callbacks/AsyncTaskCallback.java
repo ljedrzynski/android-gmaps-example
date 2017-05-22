@@ -1,11 +1,10 @@
-package pl.devone.ipark.services.callback;
+package pl.devone.ipark.services.callbacks;
 
 /**
- * Created by ljedrzynski on 17.05.2017.
+ * Created by ljedrzynski on 22.05.2017.
  */
 
 public interface AsyncTaskCallback {
-
     void onSuccess();
 
     void onFailure();

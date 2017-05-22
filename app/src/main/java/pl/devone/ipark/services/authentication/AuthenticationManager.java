@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 import pl.devone.ipark.activities.LoginActivity;
 import pl.devone.ipark.R;
-import pl.devone.ipark.services.callback.AsyncTaskCallback;
+import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
 import pl.devone.ipark.services.http.RestClient;
 import pl.devone.ipark.models.User;
 import pl.devone.ipark.activities.helpers.ActivityHelper;
@@ -86,6 +86,7 @@ public class AuthenticationManager {
                 .edit()
                 .remove("user")
                 .apply();
+
         ActivityHelper.navigateActivity(currentActivity, LoginActivity.class, true);
     }
 

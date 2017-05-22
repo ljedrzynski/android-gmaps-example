@@ -34,9 +34,9 @@ import java.util.List;
 
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
-import pl.devone.ipark.services.callback.AsyncTaskCallback;
 import pl.devone.ipark.models.User;
 import pl.devone.ipark.activities.helpers.ActivityHelper;
+import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
 
 import static android.Manifest.permission.READ_CONTACTS;
 

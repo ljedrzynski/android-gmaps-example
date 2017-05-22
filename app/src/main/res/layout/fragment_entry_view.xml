@@ -11,19 +11,19 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/find_space_button"
+            android:id="@+id/search_park_space_button"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/action_find_spot"
+            android:text="@string/action_search_park_space"
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/leave_space_button"
+            android:id="@+id/leave_park_space_button"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/action_leave_spot"
+            android:text="@string/action_leave_park_space"
             android:textStyle="bold" />
 
     </LinearLayout>

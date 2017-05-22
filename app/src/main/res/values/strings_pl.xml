@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">ipark</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Authentication Strings -->
+    <string name="authorization_credentials_fail">Błąd logowania. Proszę spróbować ponownie</string>
+
+
+    <!-- Error Strings-->
+    <string name="authorization_error">Wystąpił błąd podczas autoryzacji. Spróbuj ponownie</string>
+    <string name="server_connection_error">Brak połączenia z serwerem. Spróbuj później</string>
+    <string name="network_connection_error">Brak dostępu do internetu</string>
+    <string name="error_invalid_email">Błędny format email</string>
+    <string name="error_invalid_nick">Nick jest za krótki</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_password_confirmation">Hasła się różnią</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">Pole jest wymagane!</string>
+    <string name="error_location_permission_denied">Brak pozwolenia na wykorzystanie położenia!</string>
+    <string name="error_unexpected">Wystąpił nieoczekiwany błąd!</string>
+    <string name="error_server_communication">Błąd komunikacji z serwerem</string>
+    <string name="error_reported_info">Błąd został zgłoszony i przekazany do dalszego procesowania</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_nick_name">Nick</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_confirm_password">Confirm Password</string>
+
+    <!--Permission Strigns-->
+    <string name="title_location_permission">Zgoda na dostęp do położenia</string>
+    <string name="info_location_permission">Aplikacja wymaga dostępu do położenia</string>
+
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <string name="title_activity_register">Sign up</string>
+    <string name="title_main">IPark</string>
+
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_up">Sign up</string>
+    <string name="action_close">Close</string>
+    <string name="action_sign_out">Sign out</string>
+
+
+    <!-- Main Activity-->
+    <string name="action_search_park_space">Znajdź miejsce</string>
+    <string name="action_search_continue">Szukaj dalej</string>
+    <string name="action_leave_park_space">Zwolnij miejsce</string>
+
+</resources>

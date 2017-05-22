@@ -9,7 +9,6 @@ import com.loopj.android.http.ResponseHandlerInterface;
 
 import java.io.UnsupportedEncodingException;
 
-import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import pl.devone.ipark.services.http.helpers.HttpHelper;
 
@@ -20,8 +19,8 @@ import pl.devone.ipark.services.http.helpers.HttpHelper;
 public class RestClient {
     private static AsyncHttpClient client = new AsyncHttpClient();
 
-    public static void get(Context context, String url, Header[] headers, RequestParams params, ResponseHandlerInterface responseHandler) {
-        client.get(context, HttpHelper.getApiAbsoluteUrl(context, url), headers, params, responseHandler);
+    public static void get(Context context, String url, RequestParams params, ResponseHandlerInterface responseHandler) {
+        client.get(context, HttpHelper.getApiAbsoluteUrl(context, url), params, responseHandler);
     }
 
     public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {

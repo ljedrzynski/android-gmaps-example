@@ -35,7 +35,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.List;
+
 import pl.devone.ipark.R;
+import pl.devone.ipark.models.ParkingSpace;
 
 
 /**
@@ -162,6 +165,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            onLocationChanged(mLastLocation);
+        }
+
         mLocationRequest = new LocationRequest()
                 .setInterval(1000)
                 .setFastestInterval(1000)
@@ -187,11 +196,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
+
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        mCurrLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(latLng).zoom(16).bearing(0).tilt(45).build()));
+
+        mCurrLocationMarker = mMap.addMarker
+                (getCurrPositionMarkerOptions(latLng));
+
+        moveCamera(latLng, 16, 0, 45);
+    }
+
+    private void moveCamera(LatLng latLng, float zoom, float bearing, float tilt) {
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition
+                (CameraPosition.builder().target(latLng)
+                        .zoom(zoom)
+                        .bearing(bearing)
+                        .tilt(tilt)
+                        .build()));
+    }
+
+    private MarkerOptions getCurrPositionMarkerOptions(LatLng latLng) {
+        return new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory
+                        .defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+    }
+
+    public void markFreeParkingSpaces(List<ParkingSpace> parkingSpaces) {
+        for (ParkingSpace parkingSpace : parkingSpaces) {
+            mMap.addMarker
+                    (new MarkerOptions()
+                            .position(new LatLng(parkingSpace.getLatitude(), parkingSpace.getLongitude()))
+                            .icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        }
     }
 }

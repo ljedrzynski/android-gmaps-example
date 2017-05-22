@@ -30,9 +30,12 @@ public class ParkingSpace implements Serializable {
     private Date createdAt;
     private Date updatedAt;
 
-    public ParkingSpace(Location location) {
+    public ParkingSpace(Location location, User user) {
         this.latitude = location.getLatitude();
         this.longitude = location.getLongitude();
+        this.occupied = false;
+        this.lastOccupierId = user.getId();
+        this.reporterId = user.getId();
     }
 
     public Long getId() {
