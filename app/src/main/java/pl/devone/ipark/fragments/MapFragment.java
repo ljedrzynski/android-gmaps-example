@@ -32,6 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -39,6 +40,8 @@ import java.util.List;
 
 import pl.devone.ipark.R;
 import pl.devone.ipark.models.ParkingSpace;
+
+import static android.R.attr.padding;
 
 
 /**
@@ -56,6 +59,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
+    MapActionCallback mCallbacks;
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
@@ -65,6 +69,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mCallbacks = (MapActionCallback) getParentFragment();
     }
 
     @Override
@@ -161,6 +166,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                moveCamera(marker.getPosition(), 16, 0, 45);
+                mCallbacks.onMarkerClick();
+                return true;
+            }
+
+        });
     }
 
     @Override
@@ -209,8 +224,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void moveCamera(LatLng latLng, float zoom, float bearing, float tilt) {
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition
-                (CameraPosition.builder().target(latLng)
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition
+                (CameraPosition.builder()
+                        .target(latLng)
                         .zoom(zoom)
                         .bearing(bearing)
                         .tilt(tilt)
@@ -225,12 +241,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     public void markFreeParkingSpaces(List<ParkingSpace> parkingSpaces) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
         for (ParkingSpace parkingSpace : parkingSpaces) {
-            mMap.addMarker
+            Marker marker = mMap.addMarker
                     (new MarkerOptions()
                             .position(new LatLng(parkingSpace.getLatitude(), parkingSpace.getLongitude()))
                             .icon(BitmapDescriptorFactory
                                     .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            builder.include(marker.getPosition());
         }
+
+        builder.include(mCurrLocationMarker.getPosition());
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 200));
+    }
+
+    interface MapActionCallback {
+
+        void onMarkerClick();
+
     }
 }

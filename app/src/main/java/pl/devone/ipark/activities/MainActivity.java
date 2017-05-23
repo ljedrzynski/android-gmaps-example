@@ -50,9 +50,9 @@ public class MainActivity extends Activity
         }
         if (!AuthenticationManager.isAppAuthenticated(getApplicationContext())) {
             navigateLoginActivity();
+        } else {
+            RestClient.setAuthorizationHeader(ActivityHelper.getUser(this).getAuthToken());
         }
-
-        RestClient.setAuthorizationHeader(ActivityHelper.getUser(this).getAuthToken());
     }
 
     @Override

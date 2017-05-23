@@ -24,7 +24,8 @@ import pl.devone.ipark.services.parkingspace.callbacks.ParkingSpaceFetchCallback
  */
 public class MainFragment extends Fragment implements
         EntryViewFragment.EntryViewActionCallbacks,
-        SearchViewFragment.SearchViewActionCallbacks {
+        SearchViewFragment.SearchViewActionCallbacks,
+        MapFragment.MapActionCallback {
 
     private View mView;
     private MapFragment mapFragment;
@@ -60,8 +61,14 @@ public class MainFragment extends Fragment implements
         ParkingSpaceManager.getParkingSpaces(getContext(), mapFragment.mLastLocation, new ParkingSpaceFetchCallback() {
             @Override
             public void onSuccess(List<ParkingSpace> parkingSpaces) {
-                mapFragment.markFreeParkingSpaces(parkingSpaces);
+                if (parkingSpaces == null || parkingSpaces.size() == 0) {
+                    Toast.makeText(getContext(), "Brak wolnych miejsc w okolicy! ", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 setView(new SearchViewFragment());
+                mapFragment.markFreeParkingSpaces(parkingSpaces);
+
                 Toast.makeText(getContext(), "Znaleziono w okolicy " + parkingSpaces.size() + (parkingSpaces.size() > 1 ? "miejsc" : "miejsce"), Toast.LENGTH_LONG).show();
             }
 
@@ -95,5 +102,10 @@ public class MainFragment extends Fragment implements
     @Override
     public void onSearchContinueAction() {
         onFindSpaceAction();
+    }
+
+    @Override
+    public void onMarkerClick() {
+        Toast.makeText(getContext(), "Marker clicked!", Toast.LENGTH_LONG).show();
     }
 }
