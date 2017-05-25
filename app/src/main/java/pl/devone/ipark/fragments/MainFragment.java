@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+
 import java.util.List;
 
 import pl.devone.ipark.R;
@@ -25,10 +26,10 @@ import pl.devone.ipark.services.parkingspace.callbacks.ParkingSpaceFetchCallback
 public class MainFragment extends Fragment implements
         EntryViewFragment.EntryViewActionCallbacks,
         SearchViewFragment.SearchViewActionCallbacks,
-        MapFragment.MapActionCallback {
+        MapBoxFragment.MapActionCallback {
 
     private View mView;
-    private MapFragment mapFragment;
+    private MapBoxFragment mapFragment;
 
     public MainFragment() {
     }
@@ -51,7 +52,7 @@ public class MainFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mapFragment = (MapFragment)
+        mapFragment = (MapBoxFragment)
                 getChildFragmentManager().findFragmentById(R.id.fragment_map);
 
     }

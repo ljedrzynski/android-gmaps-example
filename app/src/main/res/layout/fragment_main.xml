@@ -6,10 +6,10 @@
 
     <fragment
         android:id="@+id/fragment_map"
-        android:name="pl.devone.ipark.fragments.MapFragment"
+        android:name="pl.devone.ipark.fragments.MapBoxFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/fragment_map">
+        tools:layout="@layout/fragment_map_box">
 
 
         <FrameLayout

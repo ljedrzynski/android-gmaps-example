@@ -38,5 +38,10 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.google.android.gms:play-services-plus:10.2.6'
     compile 'com.google.android.gms:play-services-location:10.2.6'
+    compile 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.2.0'
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.0.2@aar'){
+        transitive=true
+    }
     testCompile 'junit:junit:4.12'
+
 }
