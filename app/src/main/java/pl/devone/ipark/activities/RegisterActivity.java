@@ -35,7 +35,7 @@ import java.util.List;
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
 import pl.devone.ipark.models.User;
-import pl.devone.ipark.activities.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.CommonHelper;
 import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -215,7 +215,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
                 @Override
                 public void onSuccess() {
                     showProgress(false);
-                    ActivityHelper.navigateActivity(RegisterActivity.this, LoginActivity.class, true);
+                    CommonHelper.navigateActivity(RegisterActivity.this, LoginActivity.class, true);
                 }
 
                 @Override

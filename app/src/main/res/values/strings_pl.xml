@@ -1,16 +1,9 @@
 <resources>
-    <string name="app_name">ipark</string>
-    <string name="title_activity_main">MainActivity</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_login">Sign in</string>
-
     <!-- Authentication Strings -->
     <string name="authorization_credentials_fail">Błąd logowania. Proszę spróbować ponownie</string>
 
+    <!-- Dialogs-->
+    <string name="dialog_navigate_to_parking_space">Czy nawigować do miejsca?</string>
 
     <!-- Error Strings-->
     <string name="authorization_error">Wystąpił błąd podczas autoryzacji. Spróbuj ponownie</string>
@@ -41,18 +34,10 @@
         completions."
     </string>
 
-    <string name="title_activity_register">Sign up</string>
-    <string name="title_main">IPark</string>
-
-    <string name="action_sign_in">Sign in</string>
-    <string name="action_sign_up">Sign up</string>
-    <string name="action_close">Close</string>
-    <string name="action_sign_out">Sign out</string>
-
-
     <!-- Main Activity-->
     <string name="action_search_park_space">Znajdź miejsce</string>
     <string name="action_search_continue">Szukaj dalej</string>
+    <string name="action_navigate">Nawiguj</string>
     <string name="action_leave_park_space">Zwolnij miejsce</string>
 
 </resources>

@@ -15,7 +15,6 @@
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true">
-
     </uses-feature>
 
     <application
@@ -47,6 +46,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAeTzpJI0FV_MM2LQdEl1MLUC9FGn5fso8">
         </meta-data>
+
     </application>
 
 </manifest>

@@ -16,7 +16,7 @@ import pl.devone.ipark.R;
 import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
 import pl.devone.ipark.services.http.RestClient;
 import pl.devone.ipark.models.User;
-import pl.devone.ipark.activities.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.CommonHelper;
 
 /**
  * Created by ljedrzynski on 17.05.2017.
@@ -45,7 +45,7 @@ public class AuthenticationManager {
 
                         callback.onSuccess();
                     } catch (Exception e) {
-                        ActivityHelper.reportError(context, R.string.error_reported_info, e);
+                        CommonHelper.reportError(context, R.string.error_reported_info, e);
                     }
                 }
 
@@ -58,7 +58,7 @@ public class AuthenticationManager {
                 }
             });
         } catch (Exception exc) {
-            ActivityHelper.reportError(context, R.string.error_reported_info, exc);
+            CommonHelper.reportError(context, R.string.error_reported_info, exc);
         }
 
     }
@@ -77,7 +77,7 @@ public class AuthenticationManager {
                 }
             });
         } catch (Exception exc) {
-            ActivityHelper.reportError(context, R.string.error_reported_info, exc);
+            CommonHelper.reportError(context, R.string.error_reported_info, exc);
         }
     }
 
@@ -87,7 +87,7 @@ public class AuthenticationManager {
                 .remove("user")
                 .apply();
 
-        ActivityHelper.navigateActivity(currentActivity, LoginActivity.class, true);
+        CommonHelper.navigateActivity(currentActivity, LoginActivity.class, true);
     }
 
     public static User getUserFromContext(Context context) {

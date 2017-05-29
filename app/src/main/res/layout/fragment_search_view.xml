@@ -13,13 +13,20 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/navigate_button"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/action_navigate"
+            android:textStyle="bold" />
+
+        <Button
             android:id="@+id/search_continue_button"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/action_search_continue"
             android:textStyle="bold" />
-
     </LinearLayout>
 
 </RelativeLayout>

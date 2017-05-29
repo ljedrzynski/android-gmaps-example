@@ -17,7 +17,7 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import pl.devone.ipark.R;
-import pl.devone.ipark.activities.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.CommonHelper;
 import pl.devone.ipark.models.ParkingSpace;
 import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
 import pl.devone.ipark.services.http.RestClient;
@@ -45,7 +45,7 @@ public class ParkingSpaceManager {
                 }
             });
         } catch (Exception exc) {
-            ActivityHelper.reportError(context, R.string.error_reported_info, exc);
+            CommonHelper.reportError(context, R.string.error_reported_info, exc);
         }
     }
 
@@ -63,7 +63,7 @@ public class ParkingSpaceManager {
                 }
             });
         } catch (Exception exc) {
-            ActivityHelper.reportError(context, R.string.error_reported_info, exc);
+            CommonHelper.reportError(context, R.string.error_reported_info, exc);
         }
     }
 
@@ -93,7 +93,7 @@ public class ParkingSpaceManager {
 
             });
         } catch (Exception exc) {
-            ActivityHelper.reportError(context, R.string.error_reported_info, exc);
+            CommonHelper.reportError(context, R.string.error_reported_info, exc);
         }
     }
 }

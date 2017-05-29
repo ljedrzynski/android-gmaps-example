@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -35,7 +34,7 @@ import java.util.List;
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
 import pl.devone.ipark.models.User;
-import pl.devone.ipark.activities.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.CommonHelper;
 import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -87,7 +86,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActivityHelper.navigateActivity(LoginActivity.this, RegisterActivity.class, false);
+                CommonHelper.navigateActivity(LoginActivity.this, RegisterActivity.class, false);
             }
         });
 
@@ -160,7 +159,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             AuthenticationManager.signIn(this, new User(email, password), new AsyncTaskCallback() {
                 @Override
                 public void onSuccess() {
-                    ActivityHelper.navigateActivity(LoginActivity.this, MainActivity.class, true);
+                    CommonHelper.navigateActivity(LoginActivity.this, MainActivity.class, true);
                     showProgress(false);
                 }
 

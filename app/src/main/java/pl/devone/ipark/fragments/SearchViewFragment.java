@@ -17,7 +17,9 @@ import pl.devone.ipark.R;
  */
 public class SearchViewFragment extends Fragment {
 
-    SearchViewActionCallbacks mCallbacks;
+    private SearchViewActionCallbacks mCallbacks;
+    private Button mNavigateButton;
+    private Button mSearchContinueButton;
 
     public SearchViewFragment() {
         // Required empty public constructor
@@ -34,15 +36,28 @@ public class SearchViewFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_view, container, false);
 
-        Button searchContinueButton = (Button) view.findViewById(R.id.search_continue_button);
-        searchContinueButton.setOnClickListener(new View.OnClickListener() {
+        mSearchContinueButton = (Button) view.findViewById(R.id.search_continue_button);
+        mSearchContinueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCallbacks.onSearchContinueAction();
             }
         });
 
+        mNavigateButton = (Button) view.findViewById(R.id.navigate_button);
+        mNavigateButton.setVisibility(View.INVISIBLE);
+        mNavigateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallbacks.onNavigate();
+            }
+        });
+
         return view;
+    }
+
+    public void setNavigationButtonVisibility(int visibility) {
+        mNavigateButton.setVisibility(visibility);
     }
 
     @Override
@@ -54,5 +69,7 @@ public class SearchViewFragment extends Fragment {
     interface SearchViewActionCallbacks {
 
         void onSearchContinueAction();
+
+        void onNavigate();
     }
 }

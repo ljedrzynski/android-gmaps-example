@@ -13,8 +13,8 @@ import pl.devone.ipark.fragments.NavigationDrawerFragment;
 import pl.devone.ipark.R;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
 import pl.devone.ipark.services.http.RestClient;
-import pl.devone.ipark.services.http.helpers.ConnectionHelper;
-import pl.devone.ipark.activities.helpers.ActivityHelper;
+import pl.devone.ipark.activities.helpers.CommonHelper;
+import pl.devone.ipark.services.http.helpers.HttpHelper;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -43,14 +43,14 @@ public class MainActivity extends Activity
     }
 
     private void onCreateCheck() {
-        if (!ConnectionHelper.isOnline(getApplicationContext())) {
+        if (!HttpHelper.isOnline(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), getString(R.string.network_connection_error), Toast.LENGTH_LONG).show();
-            navigateLoginActivity();
+            CommonHelper.navigateLoginActivity(this);
         }
         if (!AuthenticationManager.isAppAuthenticated(getApplicationContext())) {
-            navigateLoginActivity();
+            CommonHelper.navigateLoginActivity(this);
         } else {
-            RestClient.setAuthorizationHeader(ActivityHelper.getUser(this).getAuthToken());
+            RestClient.setAuthorizationHeader(CommonHelper.getUser(this).getAuthToken());
         }
     }
 
@@ -78,9 +78,4 @@ public class MainActivity extends Activity
                     .commit();
         }
     }
-
-    private void navigateLoginActivity() {
-        ActivityHelper.navigateActivity(this, LoginActivity.class, true);
-    }
-
 }
