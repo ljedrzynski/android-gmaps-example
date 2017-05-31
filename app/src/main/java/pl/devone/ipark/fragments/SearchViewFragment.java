@@ -20,6 +20,7 @@ public class SearchViewFragment extends Fragment {
     private SearchViewActionCallbacks mCallbacks;
     private Button mNavigateButton;
     private Button mSearchContinueButton;
+    private boolean mNavButtonVisible = false;
 
     public SearchViewFragment() {
         // Required empty public constructor
@@ -45,7 +46,7 @@ public class SearchViewFragment extends Fragment {
         });
 
         mNavigateButton = (Button) view.findViewById(R.id.navigate_button);
-        mNavigateButton.setVisibility(View.INVISIBLE);
+        mNavigateButton.setVisibility(mNavButtonVisible ? View.VISIBLE : View.INVISIBLE);
         mNavigateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,8 +57,12 @@ public class SearchViewFragment extends Fragment {
         return view;
     }
 
-    public void setNavigationButtonVisibility(int visibility) {
-        mNavigateButton.setVisibility(visibility);
+    public Fragment setNavigationButtonVisibility(int visibility) {
+        mNavButtonVisible = visibility == View.VISIBLE;
+        if (mNavigateButton != null) {
+            mNavigateButton.setVisibility(mNavButtonVisible ? View.VISIBLE : View.INVISIBLE);
+        }
+        return this;
     }
 
     @Override

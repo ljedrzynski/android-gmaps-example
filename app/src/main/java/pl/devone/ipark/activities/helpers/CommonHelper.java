@@ -28,6 +28,13 @@ public class CommonHelper {
         navigateActivity(currentActivity, LoginActivity.class, true);
     }
 
+    public static void goBackground(Context context){
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
     public static void reportError(Context context, int errorId, Exception exc) {
         String errorMsg = context.getString(errorId);
         Log.d("ERR", exc.getMessage() + ":" + exc.getStackTrace().toString());

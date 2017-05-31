@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 
 import com.mapbox.mapboxsdk.annotations.Polyline;
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -29,12 +30,12 @@ import com.mapbox.services.android.navigation.v5.listeners.AlertLevelChangeListe
 import com.mapbox.services.android.navigation.v5.listeners.NavigationEventListener;
 import com.mapbox.services.android.navigation.v5.listeners.OffRouteListener;
 import com.mapbox.services.android.navigation.v5.listeners.ProgressChangeListener;
-import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 import com.mapbox.services.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.services.commons.models.Position;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,7 +59,7 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     private View mView;
     private MapView mMapView;
     private MapboxMap mMapBoxMap;
-    private LocationEngine mLocationEngine;
+    private MockLocationEngine mLocationEngine;
     private LocationEngineListener mLocationEngineListener;
     private MapBoxFragment.MapActionCallback mMapCallbacks;
     private MapBoxFragment.NavigationActionCallback mNavigationCallbacks;
@@ -88,8 +89,9 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
 
         //MOCK
         mLocationEngine = new MockLocationEngine();
-//        mLocationEngine = LocationSource.getLocationEngine(getContext());52.290842, 21.115158
-        ((MockLocationEngine) mLocationEngine).mockLocation(Position.fromCoordinates(21.1157, 52.2931));
+//        mLocationEngine = LocationSource.getLocationEngine(getContext());52.290842, 21.115158   52.290842	21.115158
+
+        mLocationEngine.mockLocation(Position.fromCoordinates(21.115158, 52.290842));
         mLocationEngine.setInterval(0);
         mLocationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
         mLocationEngine.setFastestInterval(1000);
@@ -113,6 +115,7 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                 mMapBoxMap = mapboxMap;
 
                 mMapBoxMap.getUiSettings().setCompassEnabled(true);
+                mMapBoxMap.getTrackingSettings().setDismissAllTrackingOnGesture(false);
 
                 mMapBoxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                     @Override
@@ -134,6 +137,7 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                 });
 
                 initLocationListener();
+
                 mMapCallbacks.onMapReady();
             }
         });
@@ -154,11 +158,11 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                 != PackageManager.PERMISSION_GRANTED) {
             PermissionHelper.requestLocationPermission(this);
         } else {
+            mMapBoxMap.setMyLocationEnabled(true);
+
             mLastLocation = mLocationEngine.getLastLocation();
 
-            if (mLastLocation != null) {
-                MapHelper.moveCamera(mMapBoxMap, new LatLng(new LatLng(mLastLocation)), 16, 0, 45, 3000);
-            }
+            setCameraPositionDefault();
 
             mLocationEngineListener = new LocationEngineListener() {
                 @Override
@@ -168,6 +172,10 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                 @Override
                 public void onLocationChanged(Location location) {
                     if (location != null) {
+                        //TODO remove
+                        if (location.getLongitude() == mLastLocation.getLongitude() && location.getLatitude() == mLastLocation.getLatitude()) {
+                            mLocationEngine.deactivate();
+                        }
                         mLastLocation = location;
                         if (mNavigating) {
                             MapHelper.moveCamera(mMapBoxMap, new LatLng(location), 60, location.getBearing(), 60, 100);
@@ -179,26 +187,41 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
             };
 
             mLocationEngine.addLocationEngineListener(mLocationEngineListener);
-            mMapBoxMap.setMyLocationEnabled(true);
+
         }
     }
 
     public void setAvailableParkSpaces(List<ParkingSpace> parkingSpaces) {
-        Set<LatLng> locations = new HashSet<>();
         mParkingSpacesMap = new HashMap<>();
 
         mMapBoxMap.clear();
 
         for (ParkingSpace parkingSpace : parkingSpaces) {
-            LatLng location = new LatLng(parkingSpace.getLatitude(), parkingSpace.getLongitude());
-            mParkingSpacesMap.put(mMapBoxMap.addMarker(new MarkerOptions().position(location)), parkingSpace);
-
-            locations.add(location);
+            mParkingSpacesMap.put(mMapBoxMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(parkingSpace.getLatitude(), parkingSpace.getLongitude()))), parkingSpace);
         }
 
-        locations.add(new LatLng(mLastLocation));
+    }
 
-        MapHelper.moveCameraToBounds(mMapBoxMap, locations);
+    public void setCameraPositionDefault() {
+        if (mMapBoxMap == null) {
+            throw new RuntimeException("MapBoxMap cannot be null!");
+        }
+
+        if (mParkingSpacesMap != null && mParkingSpacesMap.size() > 0) {
+            Set<LatLng> latLngs = new HashSet<>();
+            for (Marker marker : mParkingSpacesMap.keySet()) {
+                latLngs.add(marker.getPosition());
+            }
+            MapHelper.moveCameraToBounds(mMapBoxMap, latLngs);
+        } else if (mLastLocation != null) {
+            MapHelper.moveCamera(mMapBoxMap, new LatLng(new LatLng(mLastLocation)), 16, 0, 45, 3000);
+        }
+    }
+
+    public void clearMap() {
+        mParkingSpacesMap = null;
+        mMapBoxMap.clear();
     }
 
     public void startNavigation() {
@@ -206,12 +229,15 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
             throw new RuntimeException("Cannot start navigation without route!");
         }
         //TODO remove
-        ((MockLocationEngine) mLocationEngine).setRoute(mRoute);
-        MapBoxFragment.this.mNavigation.startNavigation(mRoute);
+        mLocationEngine.activate();
+        mLocationEngine.setRoute(mRoute);
+        mMapBoxMap.getTrackingSettings().setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+        mNavigation.startNavigation(mRoute);
         mNavigating = true;
     }
 
     public void endNavigation() {
+        mMapBoxMap.getTrackingSettings().setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
         mNavigation.endNavigation();
         mNavigating = false;
     }
@@ -258,12 +284,14 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
         return mLastLocation;
     }
 
-    public ParkingSpace getDestinationParkingSpace(){
+    public ParkingSpace getDestinationParkingSpace() {
         return mParkingSpacesMap.get(mDestinationMarker);
     }
 
     public void eraseRouteLine() {
-        mMapBoxMap.removePolyline(mRouteLine);
+        if (mRouteLine != null && mMapBoxMap.getPolylines().contains(mRouteLine)) {
+            mMapBoxMap.removePolyline(mRouteLine);
+        }
         mRouteLine = null;
     }
 

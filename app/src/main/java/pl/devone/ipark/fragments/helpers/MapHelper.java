@@ -1,5 +1,6 @@
 package pl.devone.ipark.fragments.helpers;
 
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -36,6 +37,17 @@ public class MapHelper {
     }
 
     public static void moveCameraToBounds(MapboxMap mapboxMap, int padding, int duration, Set<LatLng> positions) {
+        if (positions == null) {
+            throw new RuntimeException("Positions cannot be null! Fatal error!");
+        }
+        if (mapboxMap == null) {
+            throw new RuntimeException("MapBoxMap cannot be null. Fatal error!");
+        }
+        if (positions.size() == 1) {
+            MapHelper.moveCamera(mapboxMap, positions.iterator().next(), 16, mapboxMap.getCameraPosition().bearing, 45, 1000);
+            return;
+        }
+
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (LatLng position : positions) {
             builder.include(position);

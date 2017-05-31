@@ -1,19 +1,20 @@
 package pl.devone.ipark.fragments;
 
 import android.app.Fragment;
-import android.location.Location;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.services.api.directions.v5.models.DirectionsRoute;
-import com.mapbox.services.commons.models.Position;
 
 import java.util.List;
 
@@ -38,8 +39,7 @@ public class MainFragment extends Fragment implements
         MapBoxFragment.NavigationActionCallback {
 
     private MapBoxFragment mMapFragment;
-    private EntryViewFragment mEntryViewFragment;
-    private SearchViewFragment mSearchViewFragment;
+    private View mView;
 
 
     public MainFragment() {
@@ -48,15 +48,21 @@ public class MainFragment extends Fragment implements
     private Fragment setView(Fragment fragment) {
         getChildFragmentManager()
                 .beginTransaction()
+                .addToBackStack(null)
                 .replace(R.id.view_container, fragment)
                 .commit();
         return fragment;
     }
 
+    private Fragment getCurrentView() {
+        return getChildFragmentManager().findFragmentById(R.id.view_container);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        mView = inflater.inflate(R.layout.fragment_main, container, false);
+        return mView;
     }
 
     @Override
@@ -72,7 +78,7 @@ public class MainFragment extends Fragment implements
             @Override
             public void onRouteReady(DirectionsRoute route) {
                 mMapFragment.setRoute(route);
-                mSearchViewFragment.setNavigationButtonVisibility(View.VISIBLE);
+                ((SearchViewFragment) getCurrentView()).setNavigationButtonVisibility(View.VISIBLE);
                 MapHelper.moveCameraToBounds(mMapFragment.getMap(), 300, 2000, mMapFragment.getRouteLine().getPoints());
             }
         });
@@ -84,15 +90,18 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onFindSpaceAction() {
-        ParkingSpaceManager.getParkingSpaces(getContext(), mMapFragment.getLastLocation(), new ParkingSpaceFetchCallback() {
+        //TODO set radius in settings
+        ParkingSpaceManager.getParkingSpaces(getContext(), mMapFragment.getLastLocation(), 1, new ParkingSpaceFetchCallback() {
             @Override
             public void onSuccess(List<ParkingSpace> parkingSpaces) {
+                mMapFragment.clearMap();
                 if (parkingSpaces == null || parkingSpaces.size() == 0) {
                     Toast.makeText(getContext(), "Brak wolnych miejsc w okolicy! ", Toast.LENGTH_LONG).show();
                     return;
                 }
-                mSearchViewFragment = (SearchViewFragment) setView(new SearchViewFragment());
+                setView(new SearchViewFragment());
                 mMapFragment.setAvailableParkSpaces(parkingSpaces);
+                mMapFragment.setCameraPositionDefault();
                 Toast.makeText(getContext(), "Znaleziono " + parkingSpaces.size() + (parkingSpaces.size() > 1 ? " miejsc" : "miejsce"), Toast.LENGTH_LONG).show();
             }
 
@@ -132,7 +141,7 @@ public class MainFragment extends Fragment implements
         updateParkingSpaceStatus(parkingSpace, new AsyncTaskCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getContext(), "OKO!", Toast.LENGTH_LONG).show();
+                CommonHelper.goBackground(getContext());
             }
 
             @Override
@@ -151,12 +160,12 @@ public class MainFragment extends Fragment implements
     public void onOccupied() {
         ParkingSpace parkingSpace = mMapFragment.getDestinationParkingSpace();
         parkingSpace.setLastOccupierId(parkingSpace.getCurrOccupierId());
-        parkingSpace.setCurrOccupierId((long) -1);
+        parkingSpace.setCurrOccupierId(null);
         parkingSpace.setOccupied(true);
         updateParkingSpaceStatus(parkingSpace, new AsyncTaskCallback() {
             @Override
             public void onSuccess() {
-                mSearchViewFragment = (SearchViewFragment) setView(new SearchViewFragment());
+                setView(new SearchViewFragment());
             }
 
             @Override
@@ -184,30 +193,47 @@ public class MainFragment extends Fragment implements
         if (!mMapFragment.isRouteSet()) {
             //TODO
         }
-        mSearchViewFragment.setNavigationButtonVisibility(View.INVISIBLE);
+        ((SearchViewFragment) getCurrentView()).setNavigationButtonVisibility(View.INVISIBLE);
         mMapFragment.startNavigation();
     }
 
     @Override
     public void onMapReady() {
-        mEntryViewFragment = (EntryViewFragment) setView(new EntryViewFragment());
+        setView(new EntryViewFragment());
     }
 
     @Override
     public void onMapClick(LatLng point) {
-        if (mSearchViewFragment != null) {
-            mSearchViewFragment.setNavigationButtonVisibility(View.INVISIBLE);
+        Fragment currentView = getCurrentView();
+        if (currentView instanceof SearchViewFragment) {
+            ((SearchViewFragment) currentView).setNavigationButtonVisibility(View.INVISIBLE);
+        }
+        if (currentView instanceof ArrivedViewFragment) {
+            setView(new EntryViewFragment());
         }
         mMapFragment.eraseRouteLine();
+        mMapFragment.setCameraPositionDefault();
     }
 
     @Override
     public void onMarkerClick(Marker marker) {
-        calculateRoute(marker);
+        mMapFragment.eraseRouteLine();
+
+        if (LocationHelper.isLocationInRadius(new LatLng(mMapFragment.getLastLocation()), marker.getPosition(), 0.1)) {
+            MapHelper.moveCameraToBounds(mMapFragment.getMap(), 300, 2000, new LatLng(mMapFragment.getLastLocation()), marker.getPosition());
+            setView(new ArrivedViewFragment());
+        } else {
+            if (!(getCurrentView() instanceof SearchViewFragment)) {
+                setView(new SearchViewFragment().setNavigationButtonVisibility(View.VISIBLE));
+            }
+            calculateRoute(marker);
+        }
     }
 
     @Override
     public void onArrived() {
+        mMapFragment.endNavigation();
+        mMapFragment.eraseRouteLine();
         setView(new ArrivedViewFragment());
     }
 

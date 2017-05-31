@@ -67,16 +67,18 @@ public class ParkingSpaceManager {
         }
     }
 
-    public static void getParkingSpaces(final Context context, final Location location, final ParkingSpaceFetchCallback callback) {
+    public static void getParkingSpaces(final Context context, final Location location, final double radius, final ParkingSpaceFetchCallback callback) {
         try {
             RestClient.get(context, context.getString(R.string.parking_spaces_url), new RequestParams(new HashMap<String, String>() {{
                 put("lng", String.valueOf(location.getLongitude()));
                 put("lat", String.valueOf(location.getLatitude()));
+                put("rad", String.valueOf(radius));
             }}), new JsonHttpResponseHandler() {
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                    Type collectionType = new TypeToken<List<ParkingSpace>>() {}.getType();
+                    Type collectionType = new TypeToken<List<ParkingSpace>>() {
+                    }.getType();
                     List<ParkingSpace> parkingSpaces = gson.fromJson(response.toString(), collectionType);
 
                     if (parkingSpaces == null || parkingSpaces.size() == 0) {

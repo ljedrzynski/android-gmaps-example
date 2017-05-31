@@ -51,6 +51,7 @@ public class MockLocationEngine extends LocationEngine {
     private int currentStep;
     private double distance;
     private int currentLeg;
+    private boolean stop;
 
   /*
    * Constructors
@@ -108,6 +109,7 @@ public class MockLocationEngine extends LocationEngine {
         if (handler != null && runnable != null) {
             handler.removeCallbacks(runnable);
         }
+        stop = true;
     }
 
     /**
@@ -257,6 +259,7 @@ public class MockLocationEngine extends LocationEngine {
      */
     public void setRoute(DirectionsRoute route) {
         this.route = route;
+        stop = false;
 
         if (handler != null && runnable != null) {
             handler.removeCallbacks(runnable);
@@ -336,6 +339,7 @@ public class MockLocationEngine extends LocationEngine {
     private class LocationUpdateRunnable implements Runnable {
         @Override
         public void run() {
+            stop = false;
             if (positions.size() <= 5) {
                 calculateStepPoints();
             }
@@ -346,12 +350,14 @@ public class MockLocationEngine extends LocationEngine {
                 Location location = mockLocation(positions.get(0));
                 for (LocationEngineListener listener : locationListeners) {
                     listener.onLocationChanged(location);
+                    if(stop) return;
                 }
                 positions.remove(0);
             } else {
                 Location location = getLastLocation();
                 for (LocationEngineListener listener : locationListeners) {
                     listener.onLocationChanged(location);
+                    if(stop) return;
                 }
             }
             // Schedule the next update
