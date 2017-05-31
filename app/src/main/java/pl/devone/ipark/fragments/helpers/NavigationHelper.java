@@ -48,13 +48,13 @@ public class NavigationHelper {
     }
 
     public static void calculateRoute(MapboxMap mapboxMap, MapboxNavigation navigation,
-                                      Position destination, final MapBoxFragment.NavigationActionCallback callback) {
+                                      Position destination, final MapBoxFragment.CalculateRouteCallback callback) {
         Location userLocation = mapboxMap.getMyLocation();
         if (userLocation == null) {
             Timber.d("calculateRoute: User location is null, therefore, origin can't be set.");
             return;
         }
-        Position origin = LocationHelper.locationToPosition(userLocation);
+        Position origin = LocationHelper.positionFromLocation(userLocation);
 
         navigation.getRoute(origin, destination, new Callback<DirectionsResponse>() {
             @Override

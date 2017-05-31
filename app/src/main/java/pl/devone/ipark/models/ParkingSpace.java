@@ -109,4 +109,59 @@ public class ParkingSpace implements Serializable {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ParkingSpace that = (ParkingSpace) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (latitude != null ? !latitude.equals(that.latitude) : that.latitude != null)
+            return false;
+        if (longitude != null ? !longitude.equals(that.longitude) : that.longitude != null)
+            return false;
+        if (occupied != null ? !occupied.equals(that.occupied) : that.occupied != null)
+            return false;
+        if (currOccupierId != null ? !currOccupierId.equals(that.currOccupierId) : that.currOccupierId != null)
+            return false;
+        if (lastOccupierId != null ? !lastOccupierId.equals(that.lastOccupierId) : that.lastOccupierId != null)
+            return false;
+        if (reporterId != null ? !reporterId.equals(that.reporterId) : that.reporterId != null)
+            return false;
+        if (createdAt != null ? !createdAt.equals(that.createdAt) : that.createdAt != null)
+            return false;
+        return updatedAt != null ? updatedAt.equals(that.updatedAt) : that.updatedAt == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (latitude != null ? latitude.hashCode() : 0);
+        result = 31 * result + (longitude != null ? longitude.hashCode() : 0);
+        result = 31 * result + (occupied != null ? occupied.hashCode() : 0);
+        result = 31 * result + (currOccupierId != null ? currOccupierId.hashCode() : 0);
+        result = 31 * result + (lastOccupierId != null ? lastOccupierId.hashCode() : 0);
+        result = 31 * result + (reporterId != null ? reporterId.hashCode() : 0);
+        result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
+        result = 31 * result + (updatedAt != null ? updatedAt.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ParkingSpace{" +
+                "id=" + id +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", occupied=" + occupied +
+                ", currOccupierId=" + currOccupierId +
+                ", lastOccupierId=" + lastOccupierId +
+                ", reporterId=" + reporterId +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

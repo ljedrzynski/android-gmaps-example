@@ -11,11 +11,11 @@ import com.mapbox.services.commons.models.Position;
 
 public class LocationHelper {
 
-    public static Position latLngToPosition(LatLng latLng) {
+    public static Position positionFromLatLng(LatLng latLng) {
         return Position.fromCoordinates(latLng.getLongitude(), latLng.getLatitude(), latLng.getAltitude());
     }
 
-    public static Location latLngToLocation(LatLng latLng) {
+    public static Location locationFromLatLng(LatLng latLng) {
         Location location = new Location("");
         location.setLongitude(latLng.getLongitude());
         location.setLatitude(latLng.getLatitude());
@@ -23,7 +23,7 @@ public class LocationHelper {
         return location;
     }
 
-    public static Position locationToPosition(Location location) {
+    public static Position positionFromLocation(Location location) {
         return Position.fromCoordinates(location.getLongitude(), location.getLatitude(), location.getAltitude());
     }
 }

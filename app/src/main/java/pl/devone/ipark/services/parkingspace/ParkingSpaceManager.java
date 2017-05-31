@@ -51,7 +51,7 @@ public class ParkingSpaceManager {
 
     public static void updateParkingSpace(final Context context, final ParkingSpace parkingSpace, final AsyncTaskCallback callback) {
         try {
-            RestClient.put(context, context.getString(R.string.parking_spaces_url), gson.toJson(parkingSpace), new JsonHttpResponseHandler() {
+            RestClient.put(context, context.getString(R.string.parking_spaces_url) + "/" + parkingSpace.getId(), gson.toJson(parkingSpace), new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     callback.onSuccess();

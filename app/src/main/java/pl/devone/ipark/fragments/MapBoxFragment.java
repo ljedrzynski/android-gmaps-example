@@ -1,8 +1,6 @@
 package pl.devone.ipark.fragments;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,11 +19,11 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.services.android.navigation.v5.MapboxNavigation;
+import com.mapbox.services.android.navigation.v5.NavigationConstants;
 import com.mapbox.services.android.navigation.v5.RouteProgress;
 import com.mapbox.services.android.navigation.v5.listeners.AlertLevelChangeListener;
 import com.mapbox.services.android.navigation.v5.listeners.NavigationEventListener;
@@ -37,14 +35,17 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 import com.mapbox.services.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.services.commons.models.Position;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import pl.devone.ipark.MockLocationEngine;
 import pl.devone.ipark.R;
 import pl.devone.ipark.fragments.helpers.MapHelper;
 import pl.devone.ipark.fragments.helpers.NavigationHelper;
+import pl.devone.ipark.fragments.helpers.PermissionHelper;
 import pl.devone.ipark.models.ParkingSpace;
 import pl.devone.ipark.services.authentication.AuthenticationManager;
 
@@ -59,7 +60,8 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     private MapboxMap mMapBoxMap;
     private LocationEngine mLocationEngine;
     private LocationEngineListener mLocationEngineListener;
-    private MapBoxFragment.MapActionCallback mCallbacks;
+    private MapBoxFragment.MapActionCallback mMapCallbacks;
+    private MapBoxFragment.NavigationActionCallback mNavigationCallbacks;
 
     //Navigation related
     private MapboxNavigation mNavigation;
@@ -67,11 +69,10 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     private DirectionsRoute mRoute;
     private Polyline mRouteLine;
     private boolean mNavigating;
-    private Marker destinationMarker;
-
+    private Marker mDestinationMarker;
     private Location mLastLocation;
 
-    public static final int PERMISSION_REQUEST_LOCATION = 99;
+    private Map<Marker, ParkingSpace> mParkingSpacesMap;
 
     public MapBoxFragment() {
     }
@@ -82,12 +83,13 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
 
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_token));
 
-        mCallbacks = (MapBoxFragment.MapActionCallback) getParentFragment();
+        mMapCallbacks = (MapBoxFragment.MapActionCallback) getParentFragment();
+        mNavigationCallbacks = (MapBoxFragment.NavigationActionCallback) getParentFragment();
 
         //MOCK
         mLocationEngine = new MockLocationEngine();
-//        mLocationEngine = LocationSource.getLocationEngine(getContext());
-        ((MockLocationEngine) mLocationEngine).mockLocation(Position.fromCoordinates(21.115555, 52.2930));
+//        mLocationEngine = LocationSource.getLocationEngine(getContext());52.290842, 21.115158
+        ((MockLocationEngine) mLocationEngine).mockLocation(Position.fromCoordinates(21.1157, 52.2931));
         mLocationEngine.setInterval(0);
         mLocationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
         mLocationEngine.setFastestInterval(1000);
@@ -115,24 +117,24 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                 mMapBoxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker) {
-                        if (marker == destinationMarker) {
+                        if (marker == mDestinationMarker) {
                             return false;
                         }
-                        destinationMarker = marker;
-                        mCallbacks.onMarkerClick(marker);
+                        mDestinationMarker = marker;
+                        mMapCallbacks.onMarkerClick(marker);
                         return true;
                     }
                 });
                 mMapBoxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
-                        destinationMarker = null;
-                        mCallbacks.onMapClick(point);
+                        mDestinationMarker = null;
+                        mMapCallbacks.onMapClick(point);
                     }
                 });
 
                 initLocationListener();
-                mCallbacks.onMapReady();
+                mMapCallbacks.onMapReady();
             }
         });
 
@@ -140,51 +142,17 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     }
 
     private void initNavigationListeners() {
-        mNavigation.addNavigationEventListener(new NavigationEventListener() {
-            @Override
-            public void onRunning(boolean running) {
-
-            }
-        });
-        mNavigation.addProgressChangeListener(new ProgressChangeListener() {
-            @Override
-            public void onProgressChange(Location location, RouteProgress routeProgress) {
-//                NavigationHelper.setRoute(mMapBoxMap, mRouteLine, routeProgress.getRoute());
-            }
-        });
-        mNavigation.addAlertLevelChangeListener(new AlertLevelChangeListener() {
-            @Override
-            public void onAlertLevelChange(int alertLevel, RouteProgress routeProgress) {
-                //TODO
-            }
-        });
-    }
-
-    private void requestLocationPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getParentFragment().getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-            new AlertDialog.Builder(getContext())
-                    .setTitle(getString(R.string.title_location_permission))
-                    .setMessage(getString(R.string.info_location_permission))
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    PERMISSION_REQUEST_LOCATION);
-                        }
-                    })
-                    .create()
-                    .show();
-        } else {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSION_REQUEST_LOCATION);
-        }
+        mNavigation.addProgressChangeListener(this);
+        mNavigation.addAlertLevelChangeListener(this);
+        mNavigation.addNavigationEventListener(this);
+        mNavigation.addOffRouteListener(this);
     }
 
     private void initLocationListener() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            requestLocationPermission();
+            PermissionHelper.requestLocationPermission(this);
         } else {
             mLastLocation = mLocationEngine.getLastLocation();
 
@@ -209,21 +177,25 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                     }
                 }
             };
+
             mLocationEngine.addLocationEngineListener(mLocationEngineListener);
             mMapBoxMap.setMyLocationEnabled(true);
         }
     }
 
-    public void markFreeParkingSpaces(List<ParkingSpace> parkingSpaces) {
+    public void setAvailableParkSpaces(List<ParkingSpace> parkingSpaces) {
         Set<LatLng> locations = new HashSet<>();
+        mParkingSpacesMap = new HashMap<>();
+
         mMapBoxMap.clear();
 
         for (ParkingSpace parkingSpace : parkingSpaces) {
             LatLng location = new LatLng(parkingSpace.getLatitude(), parkingSpace.getLongitude());
-            mMapBoxMap.addMarker(new MarkerOptions()
-                    .position(location));
+            mParkingSpacesMap.put(mMapBoxMap.addMarker(new MarkerOptions().position(location)), parkingSpace);
+
             locations.add(location);
         }
+
         locations.add(new LatLng(mLastLocation));
 
         MapHelper.moveCameraToBounds(mMapBoxMap, locations);
@@ -244,7 +216,7 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
         mNavigating = false;
     }
 
-    public void calculateRoute(Position destination, NavigationActionCallback readyCallback) {
+    public void calculateRoute(Position destination, CalculateRouteCallback readyCallback) {
         mDestination = destination;
         NavigationHelper.calculateRoute(mMapBoxMap, mNavigation, destination, readyCallback);
     }
@@ -286,6 +258,10 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
         return mLastLocation;
     }
 
+    public ParkingSpace getDestinationParkingSpace(){
+        return mParkingSpacesMap.get(mDestinationMarker);
+    }
+
     public void eraseRouteLine() {
         mMapBoxMap.removePolyline(mRouteLine);
         mRouteLine = null;
@@ -322,7 +298,7 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     public void onDestroy() {
         super.onDestroy();
         endNavigation();
-        mCallbacks = null;
+        mMapCallbacks = null;
         mNavigation.removeAlertLevelChangeListener(this);
         mNavigation.removeNavigationEventListener(this);
         mNavigation.removeProgressChangeListener(this);
@@ -343,7 +319,11 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
 
     @Override
     public void onAlertLevelChange(int alertLevel, RouteProgress routeProgress) {
-
+        switch (alertLevel) {
+            case NavigationConstants.ARRIVE_ALERT_LEVEL:
+                mNavigationCallbacks.onArrived();
+                break;
+        }
     }
 
     @Override
@@ -358,13 +338,13 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
 
     @Override
     public void userOffRoute(Location location) {
-
+        mNavigationCallbacks.onUserOffRoute(mDestinationMarker);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_REQUEST_LOCATION:
+            case PermissionHelper.PERMISSION_REQUEST_LOCATION:
                 boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 mMapBoxMap.setMyLocationEnabled(granted);
                 if (!granted) {
@@ -389,9 +369,15 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
 
     }
 
-    public interface NavigationActionCallback {
+    interface NavigationActionCallback {
+
+        void onArrived();
+
+        void onUserOffRoute(Marker marker);
+    }
+
+    public interface CalculateRouteCallback {
 
         void onRouteReady(DirectionsRoute route);
-
     }
 }

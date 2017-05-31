@@ -4,6 +4,7 @@
 
     <!-- Dialogs-->
     <string name="dialog_navigate_to_parking_space">Czy nawigować do miejsca?</string>
+    <string name="dialog_arrived">Dojechałeś na miejsce</string>
 
     <!-- Error Strings-->
     <string name="authorization_error">Wystąpił błąd podczas autoryzacji. Spróbuj ponownie</string>
@@ -39,5 +40,7 @@
     <string name="action_search_continue">Szukaj dalej</string>
     <string name="action_navigate">Nawiguj</string>
     <string name="action_leave_park_space">Zwolnij miejsce</string>
+    <string name="action_park_space_occupying">Zajmuje</string>
+    <string name="action_park_space_occupied">Miejsce jest zajęte</string>
 
 </resources>
