@@ -28,10 +28,6 @@ public class MapHelper {
                         .build())), duration);
     }
 
-    public static void moveCameraToBounds(MapboxMap mapboxMap, Set<LatLng> positions) {
-        moveCameraToBounds(mapboxMap, 200, 3000, positions);
-    }
-
     public static void moveCameraToBounds(MapboxMap mapboxMap, int padding, int duration, List<LatLng> positions) {
         moveCameraToBounds(mapboxMap, padding, duration, new HashSet<>(positions));
     }
@@ -52,6 +48,7 @@ public class MapHelper {
         for (LatLng position : positions) {
             builder.include(position);
         }
+
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), padding), duration);
     }
 

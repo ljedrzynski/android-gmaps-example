@@ -35,7 +35,6 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 import com.mapbox.services.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.services.commons.models.Position;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -136,6 +135,13 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                     }
                 });
 
+                mMapBoxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(@NonNull LatLng point) {
+                        mMapCallbacks.onMapLongClick(point);
+                    }
+                });
+
                 initLocationListener();
 
                 mMapCallbacks.onMapReady();
@@ -187,7 +193,6 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
             };
 
             mLocationEngine.addLocationEngineListener(mLocationEngineListener);
-
         }
     }
 
@@ -210,12 +215,15 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
 
         if (mParkingSpacesMap != null && mParkingSpacesMap.size() > 0) {
             Set<LatLng> latLngs = new HashSet<>();
+
+            latLngs.add(new LatLng(mLastLocation));
             for (Marker marker : mParkingSpacesMap.keySet()) {
                 latLngs.add(marker.getPosition());
             }
-            MapHelper.moveCameraToBounds(mMapBoxMap, latLngs);
+
+            MapHelper.moveCameraToBounds(mMapBoxMap, 300, 1000, latLngs);
         } else if (mLastLocation != null) {
-            MapHelper.moveCamera(mMapBoxMap, new LatLng(new LatLng(mLastLocation)), 16, 0, 45, 3000);
+            MapHelper.moveCamera(mMapBoxMap, new LatLng(new LatLng(mLastLocation)), 16, 0, 45, 2000);
         }
     }
 
@@ -317,8 +325,10 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     @Override
     public void onStop() {
         super.onStop();
+
         mMapView.onStop();
         mMapView.onDestroy();
+
         mNavigation.onStop();
     }
 
@@ -326,7 +336,9 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     public void onDestroy() {
         super.onDestroy();
         endNavigation();
+
         mMapCallbacks = null;
+
         mNavigation.removeAlertLevelChangeListener(this);
         mNavigation.removeNavigationEventListener(this);
         mNavigation.removeProgressChangeListener(this);
@@ -392,6 +404,8 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
         void onMarkerClick(Marker marker);
 
         void onMapClick(LatLng point);
+
+        void onMapLongClick(LatLng point);
 
         void onMapReady();
 

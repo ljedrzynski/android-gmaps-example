@@ -1,19 +1,16 @@
 package pl.devone.ipark.fragments;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.services.api.directions.v5.models.DirectionsRoute;
 
 import java.util.List;
@@ -138,6 +135,7 @@ public class MainFragment extends Fragment implements
         parkingSpace.setLastOccupierId(parkingSpace.getCurrOccupierId());
         parkingSpace.setCurrOccupierId(CommonHelper.getUser(getContext()).getId());
         parkingSpace.setOccupied(true);
+
         updateParkingSpaceStatus(parkingSpace, new AsyncTaskCallback() {
             @Override
             public void onSuccess() {
@@ -162,6 +160,7 @@ public class MainFragment extends Fragment implements
         parkingSpace.setLastOccupierId(parkingSpace.getCurrOccupierId());
         parkingSpace.setCurrOccupierId(null);
         parkingSpace.setOccupied(true);
+
         updateParkingSpaceStatus(parkingSpace, new AsyncTaskCallback() {
             @Override
             public void onSuccess() {
@@ -205,27 +204,36 @@ public class MainFragment extends Fragment implements
     @Override
     public void onMapClick(LatLng point) {
         Fragment currentView = getCurrentView();
+
         if (currentView instanceof SearchViewFragment) {
             ((SearchViewFragment) currentView).setNavigationButtonVisibility(View.INVISIBLE);
         }
         if (currentView instanceof ArrivedViewFragment) {
             setView(new EntryViewFragment());
         }
+
         mMapFragment.eraseRouteLine();
         mMapFragment.setCameraPositionDefault();
+    }
+
+    @Override
+    public void onMapLongClick(LatLng point) {
+        setView(new EntryViewFragment());
     }
 
     @Override
     public void onMarkerClick(Marker marker) {
         mMapFragment.eraseRouteLine();
 
-        if (LocationHelper.isLocationInRadius(new LatLng(mMapFragment.getLastLocation()), marker.getPosition(), 0.1)) {
+        if (LocationHelper.isLocationInRadius(new LatLng(mMapFragment.getLastLocation()), marker.getPosition(), 0.01)) {
             MapHelper.moveCameraToBounds(mMapFragment.getMap(), 300, 2000, new LatLng(mMapFragment.getLastLocation()), marker.getPosition());
             setView(new ArrivedViewFragment());
+
         } else {
             if (!(getCurrentView() instanceof SearchViewFragment)) {
                 setView(new SearchViewFragment().setNavigationButtonVisibility(View.VISIBLE));
             }
+
             calculateRoute(marker);
         }
     }
