@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.util.Log;
 
 import pl.devone.ipark.R;
@@ -17,18 +18,20 @@ import pl.devone.ipark.services.authentication.AuthenticationManager;
 
 public class CommonHelper {
 
-    public static void navigateActivity(Activity currentActivity, Class nextActivityClass, boolean finish) {
-        if (finish) {
-            currentActivity.finish();
+    private static User user;
+
+    public static void navigateActivity(Context context, Class nextActivityClass, boolean finish) {
+        if (context instanceof Activity & finish) {
+            ((Activity) context).finish();
         }
-        currentActivity.startActivity(new Intent(currentActivity, nextActivityClass));
+        context.startActivity(new Intent(context, nextActivityClass));
     }
 
-    public static void navigateLoginActivity(Activity currentActivity) {
-        navigateActivity(currentActivity, LoginActivity.class, true);
+    public static void navigateLoginActivity(Context context) {
+        navigateActivity(context, LoginActivity.class, true);
     }
 
-    public static void goBackground(Context context){
+    public static void goBackground(Context context) {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -58,6 +61,6 @@ public class CommonHelper {
     }
 
     public static User getUser(Context context) {
-        return AuthenticationManager.getUserFromContext(context);
+        return user != null ? user : (user = AuthenticationManager.getUserFromContext(context));
     }
 }

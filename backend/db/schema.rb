@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170521202628) do
+ActiveRecord::Schema.define(version: 20170603102720) do
 
   create_table "parking_spaces", force: :cascade do |t|
     t.decimal "latitude", precision: 15, scale: 10
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20170521202628) do
     t.integer "reporter_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "address_info"
     t.index ["curr_occupier_id"], name: "index_parking_spaces_on_curr_occupier_id"
     t.index ["last_occupier_id"], name: "index_parking_spaces_on_last_occupier_id"
     t.index ["reporter_id"], name: "index_parking_spaces_on_reporter_id"

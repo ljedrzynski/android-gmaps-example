@@ -1,6 +1,7 @@
 package pl.devone.ipark.fragments;
 
 import android.app.Fragment;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -36,18 +37,40 @@ public class MainFragment extends Fragment implements
         MapBoxFragment.NavigationActionCallback {
 
     private MapBoxFragment mMapFragment;
-    private View mView;
-
 
     public MainFragment() {
     }
 
-    private Fragment setView(Fragment fragment) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_main, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mMapFragment = (MapBoxFragment) getChildFragmentManager()
+                .findFragmentById(R.id.fragment_map);
+    }
+
+    private Fragment replaceView(Class cls) {
+        Fragment fragment;
+        try {
+            fragment = (Fragment) cls.getConstructor().newInstance();
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
         getChildFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
                 .replace(R.id.view_container, fragment)
-                .commit();
+                .commitAllowingStateLoss();
         return fragment;
     }
 
@@ -55,20 +78,6 @@ public class MainFragment extends Fragment implements
         return getChildFragmentManager().findFragmentById(R.id.view_container);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_main, container, false);
-        return mView;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mMapFragment = (MapBoxFragment)
-                getChildFragmentManager().findFragmentById(R.id.fragment_map);
-
-    }
 
     private void calculateRoute(Marker marker) {
         mMapFragment.calculateRoute(LocationHelper.positionFromLatLng(marker.getPosition()), new MapBoxFragment.CalculateRouteCallback() {
@@ -96,7 +105,7 @@ public class MainFragment extends Fragment implements
                     Toast.makeText(getContext(), "Brak wolnych miejsc w okolicy! ", Toast.LENGTH_LONG).show();
                     return;
                 }
-                setView(new SearchViewFragment());
+                replaceView(SearchViewFragment.class);
                 mMapFragment.setAvailableParkSpaces(parkingSpaces);
                 mMapFragment.setCameraPositionDefault();
                 Toast.makeText(getContext(), "Znaleziono " + parkingSpaces.size() + (parkingSpaces.size() > 1 ? " miejsc" : "miejsce"), Toast.LENGTH_LONG).show();
@@ -111,72 +120,84 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onLeaveSpaceAction() {
-        ParkingSpaceManager.createParkingSpace(getContext(), new ParkingSpace(mMapFragment.getLastLocation(), CommonHelper.getUser(getContext())), new AsyncTaskCallback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(getContext(), "Zarejestrowane!", Toast.LENGTH_LONG).show();
-            }
+        Location location = mMapFragment.getLastLocation();
+        ParkingSpaceManager.createParkingSpace(
+                getContext(),
+                new ParkingSpace
+                        .ParkingSpaceBuilder(location.getLatitude(), location.getLongitude())
+                        .setOccupied(false)
+                        .setLastOccupierId(CommonHelper.getUser(getContext()).getId())
+                        .setReporterId(CommonHelper.getUser(getContext()).getId())
+                        .setAddressInfo(LocationHelper.simpleGeocodeReverse(getContext(), location))
+                        .build(),
+                new AsyncTaskCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(getContext(), "Zarejestrowane!", Toast.LENGTH_LONG).show();
+                    }
 
-            @Override
-            public void onFailure() {
+                    @Override
+                    public void onFailure() {
 
-            }
+                    }
 
-            @Override
-            public void onError(String error) {
+                    @Override
+                    public void onError(String error) {
 
-            }
-        });
+                    }
+                });
     }
 
     @Override
     public void onOccupying() {
         ParkingSpace parkingSpace = mMapFragment.getDestinationParkingSpace();
-        parkingSpace.setLastOccupierId(parkingSpace.getCurrOccupierId());
-        parkingSpace.setCurrOccupierId(CommonHelper.getUser(getContext()).getId());
-        parkingSpace.setOccupied(true);
+        parkingSpace.setLastOccupierId(parkingSpace.getCurrOccupierId())
+                .setCurrOccupierId(CommonHelper.getUser(getContext()).getId())
+                .setOccupied(true);
 
-        updateParkingSpaceStatus(parkingSpace, new AsyncTaskCallback() {
-            @Override
-            public void onSuccess() {
-                CommonHelper.goBackground(getContext());
-            }
+        updateParkingSpaceStatus(
+                parkingSpace,
+                new AsyncTaskCallback() {
+                    @Override
+                    public void onSuccess() {
+                        CommonHelper.goBackground(getContext());
+                    }
 
-            @Override
-            public void onFailure() {
+                    @Override
+                    public void onFailure() {
+                    }
 
-            }
-
-            @Override
-            public void onError(String error) {
-
-            }
-        });
+                    @Override
+                    public void onError(String error) {
+                    }
+                });
     }
 
     @Override
     public void onOccupied() {
         ParkingSpace parkingSpace = mMapFragment.getDestinationParkingSpace();
-        parkingSpace.setLastOccupierId(parkingSpace.getCurrOccupierId());
-        parkingSpace.setCurrOccupierId(null);
-        parkingSpace.setOccupied(true);
+        parkingSpace.setLastOccupierId(parkingSpace.getCurrOccupierId())
+                .setCurrOccupierId(null)
+                .setOccupied(true);
 
-        updateParkingSpaceStatus(parkingSpace, new AsyncTaskCallback() {
-            @Override
-            public void onSuccess() {
-                setView(new SearchViewFragment());
-            }
+        updateParkingSpaceStatus(
+                parkingSpace,
+                new AsyncTaskCallback() {
+                    @Override
+                    public void onSuccess() {
+                        replaceView(SearchViewFragment.class);
+                    }
 
-            @Override
-            public void onFailure() {
-                //TODO
-            }
+                    @Override
+                    public void onFailure() {
+                        //TODO
+                    }
 
-            @Override
-            public void onError(String error) {
-                //TODO
-            }
-        });
+                    @Override
+                    public void onError(String error) {
+                        //TODO
+                    }
+                });
     }
 
     @Override
@@ -189,51 +210,44 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void onNavigate() {
-        if (!mMapFragment.isRouteSet()) {
-            //TODO
-        }
         ((SearchViewFragment) getCurrentView()).setNavigationButtonVisibility(View.INVISIBLE);
         mMapFragment.startNavigation();
     }
 
     @Override
     public void onMapReady() {
-        setView(new EntryViewFragment());
+        replaceView(EntryViewFragment.class);
     }
 
     @Override
     public void onMapClick(LatLng point) {
         Fragment currentView = getCurrentView();
-
         if (currentView instanceof SearchViewFragment) {
             ((SearchViewFragment) currentView).setNavigationButtonVisibility(View.INVISIBLE);
         }
         if (currentView instanceof ArrivedViewFragment) {
-            setView(new EntryViewFragment());
+            replaceView(EntryViewFragment.class);
         }
-
         mMapFragment.eraseRouteLine();
         mMapFragment.setCameraPositionDefault();
     }
 
     @Override
     public void onMapLongClick(LatLng point) {
-        setView(new EntryViewFragment());
+        replaceView(EntryViewFragment.class);
     }
 
     @Override
     public void onMarkerClick(Marker marker) {
         mMapFragment.eraseRouteLine();
-
         if (LocationHelper.isLocationInRadius(new LatLng(mMapFragment.getLastLocation()), marker.getPosition(), 0.01)) {
             MapHelper.moveCameraToBounds(mMapFragment.getMap(), 300, 2000, new LatLng(mMapFragment.getLastLocation()), marker.getPosition());
-            setView(new ArrivedViewFragment());
+            replaceView(ArrivedViewFragment.class);
 
         } else {
             if (!(getCurrentView() instanceof SearchViewFragment)) {
-                setView(new SearchViewFragment().setNavigationButtonVisibility(View.VISIBLE));
+                ((SearchViewFragment) replaceView(SearchViewFragment.class)).setNavigationButtonVisibility(View.VISIBLE);
             }
-
             calculateRoute(marker);
         }
     }
@@ -242,11 +256,18 @@ public class MainFragment extends Fragment implements
     public void onArrived() {
         mMapFragment.endNavigation();
         mMapFragment.eraseRouteLine();
-        setView(new ArrivedViewFragment());
+
+        replaceView(ArrivedViewFragment.class);
     }
 
     @Override
     public void onUserOffRoute(Marker marker) {
         calculateRoute(marker);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMapFragment = null;
     }
 }

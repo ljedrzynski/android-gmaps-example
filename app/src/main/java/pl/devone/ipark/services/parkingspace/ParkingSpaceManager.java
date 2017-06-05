@@ -11,6 +11,7 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +33,16 @@ public class ParkingSpaceManager {
     private static Gson gson = new Gson();
 
     public static void createParkingSpace(final Context context, final ParkingSpace parkingSpace, final AsyncTaskCallback callback) {
+        String jsonString = new Gson().toJson(parkingSpace);
+        byte[] utf8JsonString = new byte[0];
         try {
-            RestClient.post(context, context.getString(R.string.parking_spaces_url), gson.toJson(parkingSpace), new JsonHttpResponseHandler() {
+            utf8JsonString = jsonString.getBytes("UTF8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            RestClient.post(context, context.getString(R.string.parking_spaces_url), new String(utf8JsonString), new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     callback.onSuccess();
@@ -75,6 +84,35 @@ public class ParkingSpaceManager {
                 put("rad", String.valueOf(radius));
             }}), new JsonHttpResponseHandler() {
 
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                    Type collectionType = new TypeToken<List<ParkingSpace>>() {
+                    }.getType();
+                    List<ParkingSpace> parkingSpaces = gson.fromJson(response.toString(), collectionType);
+
+                    if (parkingSpaces == null || parkingSpaces.size() == 0) {
+                        callback.onFailure();
+                    }
+
+                    callback.onSuccess(parkingSpaces);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    callback.onFailure();
+                }
+
+            });
+        } catch (Exception exc) {
+            CommonHelper.reportError(context, R.string.error_reported_info, exc);
+        }
+    }
+
+    public static void getUserParkingSpaces(final Context context, final ParkingSpaceFetchCallback callback) {
+        try {
+            RestClient.get(context, context.getString(R.string.parking_spaces_url), new RequestParams(new HashMap<String, String>() {{
+                put("usr", String.valueOf(CommonHelper.getUser(context).getId()));
+            }}), new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                     Type collectionType = new TypeToken<List<ParkingSpace>>() {

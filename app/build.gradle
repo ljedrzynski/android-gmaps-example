@@ -48,5 +48,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-plus:10.2.6'
     compile 'com.google.android.gms:play-services-location:10.2.6'
     compile 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.3.0-SNAPSHOT'
+    compile 'com.mapbox.mapboxsdk:mapbox-android-geocoder:1.0.0@aar'
     testCompile 'junit:junit:4.12'
 }

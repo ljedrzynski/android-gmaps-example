@@ -3,7 +3,11 @@ class Api::V1::ParkingSpacesController < ApplicationController
 
   # GET /parking_spaces
   def index
-    @parking_spaces = ParkingSpace.near([params[:lat], params[:lng]], params[:rad]).where(:occupied => false)
+    if params.has_key?(:usr)
+      @parking_spaces = ParkingSpace.where(:occupied => true, :curr_occupier_id => params[:usr])
+    else
+      @parking_spaces = ParkingSpace.near([params[:lat], params[:lng]], params[:rad]).where(:occupied => false)
+    end
     # @parking_spaces = ParkingSpace
     render json: @parking_spaces
   end
@@ -57,6 +61,9 @@ class Api::V1::ParkingSpacesController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def parking_space_params
-    params.require(:parking_space).permit(:latitude, :longitude, :occupied, :reporter_id, :curr_occupier_id, :last_occupier_id)
+    if params.has_key?(:address_info)
+      params[:address_info].force_encoding("ISO-8859-1").encode("UTF-8")
+    end
+    params.require(:parking_space).permit(:latitude, :longitude, :address_info, :occupied, :reporter_id, :curr_occupier_id, :last_occupier_id)
   end
 end

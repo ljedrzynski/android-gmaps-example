@@ -44,7 +44,6 @@ public class SearchViewFragment extends Fragment {
                 mCallbacks.onSearchContinueAction();
             }
         });
-
         mNavigateButton = (Button) view.findViewById(R.id.navigate_button);
         mNavigateButton.setVisibility(mNavButtonVisible ? View.VISIBLE : View.INVISIBLE);
         mNavigateButton.setOnClickListener(new View.OnClickListener() {

@@ -28,7 +28,7 @@ public class RestClient {
     }
 
     public static void post(Context context, String url, String entity, ResponseHandlerInterface responseHandler) throws UnsupportedEncodingException {
-        client.post(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json", responseHandler);
+        client.post(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json; charset=UTF-8", responseHandler);
     }
 
     public static void put(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
@@ -36,7 +36,7 @@ public class RestClient {
     }
 
     public static void put(Context context, String url, String entity, ResponseHandlerInterface responseHandler) throws UnsupportedEncodingException {
-        client.put(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json", responseHandler);
+        client.put(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json; charset=UTF-8", responseHandler);
     }
 
     public static void delete(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {

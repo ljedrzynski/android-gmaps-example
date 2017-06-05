@@ -14,8 +14,14 @@ import java.util.Date;
 public class ParkingSpace implements Serializable {
 
     private Long id;
+
     private Double latitude;
+
     private Double longitude;
+
+    @SerializedName("address_info")
+    private String addressInfo;
+
     private Boolean occupied;
 
     @SerializedName("curr_occupier_id")
@@ -28,14 +34,17 @@ public class ParkingSpace implements Serializable {
     private Long reporterId;
 
     private Date createdAt;
+
     private Date updatedAt;
 
-    public ParkingSpace(Location location, User user) {
-        this.latitude = location.getLatitude();
-        this.longitude = location.getLongitude();
-        this.occupied = false;
-        this.lastOccupierId = user.getId();
-        this.reporterId = user.getId();
+    private ParkingSpace(ParkingSpaceBuilder parkingSpaceBuilder) {
+        this.latitude = parkingSpaceBuilder.latitude;
+        this.longitude = parkingSpaceBuilder.longitude;
+        this.occupied = parkingSpaceBuilder.occupied;
+        this.lastOccupierId = parkingSpaceBuilder.lastOccupierId;
+        this.currOccupierId = parkingSpaceBuilder.currOccupierId;
+        this.reporterId = parkingSpaceBuilder.reporterId;
+        this.addressInfo = parkingSpaceBuilder.addressInfo;
     }
 
     public Long getId() {
@@ -50,64 +59,81 @@ public class ParkingSpace implements Serializable {
         return latitude;
     }
 
-    public void setLatitude(Double latitude) {
+    public ParkingSpace setLatitude(Double latitude) {
         this.latitude = latitude;
+        return this;
     }
 
     public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Double longitude) {
+    public ParkingSpace setLongitude(Double longitude) {
         this.longitude = longitude;
+        return this;
+    }
+
+    public String getAddressInfo() {
+        return addressInfo;
+    }
+
+    public ParkingSpace setAddressInfo(String addressInfo) {
+        this.addressInfo = addressInfo;
+        return this;
     }
 
     public Boolean getOccupied() {
         return occupied;
     }
 
-    public void setOccupied(Boolean occupied) {
+    public ParkingSpace setOccupied(Boolean occupied) {
         this.occupied = occupied;
+        return this;
     }
 
     public Long getCurrOccupierId() {
         return currOccupierId;
     }
 
-    public void setCurrOccupierId(Long currOccupierId) {
+    public ParkingSpace setCurrOccupierId(Long currOccupierId) {
         this.currOccupierId = currOccupierId;
+        return this;
     }
 
     public Long getLastOccupierId() {
         return lastOccupierId;
     }
 
-    public void setLastOccupierId(Long lastOccupierId) {
+    public ParkingSpace setLastOccupierId(Long lastOccupierId) {
         this.lastOccupierId = lastOccupierId;
+        return this;
     }
 
     public Long getReporterId() {
         return reporterId;
     }
 
-    public void setReporterId(Long reporterId) {
+    public ParkingSpace setReporterId(Long reporterId) {
         this.reporterId = reporterId;
+        return this;
     }
 
     public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public ParkingSpace setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+        return this;
     }
 
     public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public ParkingSpace setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+        return this;
     }
 
     @Override
@@ -121,6 +147,8 @@ public class ParkingSpace implements Serializable {
         if (latitude != null ? !latitude.equals(that.latitude) : that.latitude != null)
             return false;
         if (longitude != null ? !longitude.equals(that.longitude) : that.longitude != null)
+            return false;
+        if (addressInfo != null ? !addressInfo.equals(that.addressInfo) : that.addressInfo != null)
             return false;
         if (occupied != null ? !occupied.equals(that.occupied) : that.occupied != null)
             return false;
@@ -141,6 +169,7 @@ public class ParkingSpace implements Serializable {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (latitude != null ? latitude.hashCode() : 0);
         result = 31 * result + (longitude != null ? longitude.hashCode() : 0);
+        result = 31 * result + (addressInfo != null ? addressInfo.hashCode() : 0);
         result = 31 * result + (occupied != null ? occupied.hashCode() : 0);
         result = 31 * result + (currOccupierId != null ? currOccupierId.hashCode() : 0);
         result = 31 * result + (lastOccupierId != null ? lastOccupierId.hashCode() : 0);
@@ -156,6 +185,7 @@ public class ParkingSpace implements Serializable {
                 "id=" + id +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
+                ", addressInfo='" + addressInfo + '\'' +
                 ", occupied=" + occupied +
                 ", currOccupierId=" + currOccupierId +
                 ", lastOccupierId=" + lastOccupierId +
@@ -163,5 +193,55 @@ public class ParkingSpace implements Serializable {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
+    }
+
+    public static class ParkingSpaceBuilder {
+
+        /*Required attributes*/
+        private final Double latitude;
+        private final Double longitude;
+
+        /*Optional attributes*/
+        private Boolean occupied;
+        private String addressInfo;
+        private Long currOccupierId;
+        private Long lastOccupierId;
+        private Long reporterId;
+
+        public ParkingSpaceBuilder(Double latitude, Double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public ParkingSpaceBuilder setOccupied(Boolean occupied) {
+            this.occupied = occupied;
+            return this;
+        }
+
+        public ParkingSpaceBuilder setAddressInfo(String addressInfo) {
+            this.addressInfo = addressInfo;
+            return this;
+        }
+
+        public ParkingSpaceBuilder setCurrOccupierId(Long currOccupierId) {
+            this.currOccupierId = currOccupierId;
+            return this;
+        }
+
+        public ParkingSpaceBuilder setLastOccupierId(Long lastOccupierId) {
+            this.lastOccupierId = lastOccupierId;
+            return this;
+        }
+
+        public ParkingSpaceBuilder setReporterId(Long reporterId) {
+            this.reporterId = reporterId;
+            return this;
+        }
+
+        public ParkingSpace build() {
+            return new ParkingSpace(this);
+        }
+
+
     }
 }
