@@ -44,16 +44,4 @@ public class PermissionHelper {
         return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
-
-    public static void notifyListenersLocGranted(Set<MapBoxFragment.PermissionResultListener> listeners) {
-        for (MapBoxFragment.PermissionResultListener listener : listeners) {
-            listener.onGranted();
-        }
-    }
-
-    public static void notifyListenersLocDenied(Set<MapBoxFragment.PermissionResultListener> listeners) {
-        for (MapBoxFragment.PermissionResultListener listener : listeners) {
-            listener.onDenied();
-        }
-    }
 }

@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.devone.ipark.R;
-import pl.devone.ipark.services.authentication.AuthenticationManager;
+import pl.devone.ipark.services.authentication.AuthenticationProvider;
 import pl.devone.ipark.models.User;
 import pl.devone.ipark.activities.helpers.CommonHelper;
 import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
@@ -156,7 +156,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            AuthenticationManager.signIn(this, new User(email, password), new AsyncTaskCallback() {
+            AuthenticationProvider.signIn(this, new User(email, password), new AsyncTaskCallback() {
                 @Override
                 public void onSuccess() {
                     CommonHelper.navigateActivity(LoginActivity.this, MainActivity.class, true);

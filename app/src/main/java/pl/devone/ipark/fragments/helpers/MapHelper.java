@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class MapHelper {
 
-    public static void moveCamera(MapboxMap map, LatLng latLng, double zoom, double bearing, double tilt, int duration) {
+    public static void easeCamera(MapboxMap map, LatLng latLng, double zoom, double bearing, double tilt, int duration) {
         map.easeCamera(CameraUpdateFactory.newCameraPosition(
                 (new CameraPosition.Builder()
                         .target(latLng)
@@ -27,11 +27,11 @@ public class MapHelper {
                         .build())), duration);
     }
 
-    public static void moveCameraToBounds(MapboxMap mapboxMap, int padding, int duration, List<LatLng> positions) {
-        moveCameraToBounds(mapboxMap, padding, duration, new HashSet<>(positions));
+    public static void cameraIncludePositions(MapboxMap mapboxMap, int padding, int duration, List<LatLng> positions) {
+        cameraIncludePositions(mapboxMap, padding, duration, new HashSet<>(positions));
     }
 
-    public static void moveCameraToBounds(MapboxMap mapboxMap, int padding, int duration, Set<LatLng> positions) {
+    public static void cameraIncludePositions(MapboxMap mapboxMap, int padding, int duration, Set<LatLng> positions) {
         if (positions == null) {
             throw new RuntimeException("Positions cannot be null! Fatal error!");
         }
@@ -39,7 +39,7 @@ public class MapHelper {
             throw new RuntimeException("MapBoxMap cannot be null. Fatal error!");
         }
         if (positions.size() == 1) {
-            MapHelper.moveCamera(mapboxMap, positions.iterator().next(), 16, mapboxMap.getCameraPosition().bearing, 45, 1000);
+            MapHelper.easeCamera(mapboxMap, positions.iterator().next(), 16, mapboxMap.getCameraPosition().bearing, 45, 1000);
             return;
         }
 
@@ -51,7 +51,7 @@ public class MapHelper {
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), padding), duration);
     }
 
-    public static void moveCameraToBounds(MapboxMap mapboxMap, int padding, int duration, LatLng... positions) {
-        moveCameraToBounds(mapboxMap, padding, duration, new HashSet<>(Arrays.asList(positions)));
+    public static void cameraIncludePositions(MapboxMap mapboxMap, int padding, int duration, LatLng... positions) {
+        cameraIncludePositions(mapboxMap, padding, duration, new HashSet<>(Arrays.asList(positions)));
     }
 }

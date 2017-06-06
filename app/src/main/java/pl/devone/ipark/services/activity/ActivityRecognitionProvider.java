@@ -35,8 +35,8 @@ public class ActivityRecognitionProvider extends IntentService {
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
-    public class ActivityRecognitionBinder extends Binder {
-        public ActivityRecognitionProvider getService() {
+    class ActivityRecognitionBinder extends Binder {
+        ActivityRecognitionProvider getService() {
             return ActivityRecognitionProvider.this;
         }
     }
@@ -79,7 +79,7 @@ public class ActivityRecognitionProvider extends IntentService {
         }
     }
 
-    public interface ActivityRecognitionListener {
+    interface ActivityRecognitionListener {
 
         void onActivityDetected(DetectedActivity activity);
     }

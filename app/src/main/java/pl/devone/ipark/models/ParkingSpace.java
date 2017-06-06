@@ -1,6 +1,5 @@
 package pl.devone.ipark.models;
 
-import android.location.Location;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -37,14 +36,14 @@ public class ParkingSpace implements Serializable {
 
     private Date updatedAt;
 
-    private ParkingSpace(ParkingSpaceBuilder parkingSpaceBuilder) {
-        this.latitude = parkingSpaceBuilder.latitude;
-        this.longitude = parkingSpaceBuilder.longitude;
-        this.occupied = parkingSpaceBuilder.occupied;
-        this.lastOccupierId = parkingSpaceBuilder.lastOccupierId;
-        this.currOccupierId = parkingSpaceBuilder.currOccupierId;
-        this.reporterId = parkingSpaceBuilder.reporterId;
-        this.addressInfo = parkingSpaceBuilder.addressInfo;
+    private ParkingSpace(Builder builder) {
+        this.latitude = builder.latitude;
+        this.longitude = builder.longitude;
+        this.occupied = builder.occupied;
+        this.lastOccupierId = builder.lastOccupierId;
+        this.currOccupierId = builder.currOccupierId;
+        this.reporterId = builder.reporterId;
+        this.addressInfo = builder.addressInfo;
     }
 
     public Long getId() {
@@ -195,7 +194,7 @@ public class ParkingSpace implements Serializable {
                 '}';
     }
 
-    public static class ParkingSpaceBuilder {
+    public static class Builder {
 
         /*Required attributes*/
         private final Double latitude;
@@ -208,32 +207,32 @@ public class ParkingSpace implements Serializable {
         private Long lastOccupierId;
         private Long reporterId;
 
-        public ParkingSpaceBuilder(Double latitude, Double longitude) {
+        public Builder(Double latitude, Double longitude) {
             this.latitude = latitude;
             this.longitude = longitude;
         }
 
-        public ParkingSpaceBuilder setOccupied(Boolean occupied) {
+        public Builder setOccupied(Boolean occupied) {
             this.occupied = occupied;
             return this;
         }
 
-        public ParkingSpaceBuilder setAddressInfo(String addressInfo) {
+        public Builder setAddressInfo(String addressInfo) {
             this.addressInfo = addressInfo;
             return this;
         }
 
-        public ParkingSpaceBuilder setCurrOccupierId(Long currOccupierId) {
+        public Builder setCurrOccupierId(Long currOccupierId) {
             this.currOccupierId = currOccupierId;
             return this;
         }
 
-        public ParkingSpaceBuilder setLastOccupierId(Long lastOccupierId) {
+        public Builder setLastOccupierId(Long lastOccupierId) {
             this.lastOccupierId = lastOccupierId;
             return this;
         }
 
-        public ParkingSpaceBuilder setReporterId(Long reporterId) {
+        public Builder setReporterId(Long reporterId) {
             this.reporterId = reporterId;
             return this;
         }

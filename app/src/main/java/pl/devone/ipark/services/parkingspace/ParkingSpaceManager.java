@@ -33,16 +33,8 @@ public class ParkingSpaceManager {
     private static Gson gson = new Gson();
 
     public static void createParkingSpace(final Context context, final ParkingSpace parkingSpace, final AsyncTaskCallback callback) {
-        String jsonString = new Gson().toJson(parkingSpace);
-        byte[] utf8JsonString = new byte[0];
         try {
-            utf8JsonString = jsonString.getBytes("UTF8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            RestClient.post(context, context.getString(R.string.parking_spaces_url), new String(utf8JsonString), new JsonHttpResponseHandler() {
+            RestClient.post(context, context.getString(R.string.parking_spaces_url), new Gson().toJson(parkingSpace), new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     callback.onSuccess();

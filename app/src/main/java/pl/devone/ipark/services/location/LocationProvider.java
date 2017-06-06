@@ -44,7 +44,7 @@ public class LocationProvider extends Service implements LocationEngineListener 
         super.onCreate();
 
         if (!PermissionHelper.hasLocationPermission(getApplicationContext())) {
-            this.stopSelf();
+            stopSelf();
         }
 
         mLocationEngine = new MockLocationEngine();
@@ -52,27 +52,7 @@ public class LocationProvider extends Service implements LocationEngineListener 
         mLocationEngine.setInterval(0);
         mLocationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
         mLocationEngine.setFastestInterval(1000);
-        mLocationEngine.addLocationEngineListener(new LocationEngineListener() {
-            @Override
-            public void onConnected() {
-                mLastLocation = mLocationEngine.getLastLocation();
-            }
-
-            @Override
-            public void onLocationChanged(Location location) {
-                if (location != null) {
-                    //TODO remove
-                    if (location.getLongitude() == mLastLocation.getLongitude() && location.getLatitude() == mLastLocation.getLatitude()) {
-                        mLocationEngine.deactivate();
-                    }
-                    mLastLocation = location;
-
-                    for (LocationServiceListener mLocationServiceListener : mLocationServiceListeners) {
-                        mLocationServiceListener.onLocationChanged(location);
-                    }
-                }
-            }
-        });
+        mLocationEngine.addLocationEngineListener(this);
         mLocationEngine.activate();
 
         mLastLocation = ((MockLocationEngine) mLocationEngine).mockLocation(Position.fromCoordinates(21.115158, 52.290842));
@@ -105,7 +85,9 @@ public class LocationProvider extends Service implements LocationEngineListener 
             if (location.getLongitude() == mLastLocation.getLongitude() && location.getLatitude() == mLastLocation.getLatitude()) {
                 mLocationEngine.deactivate();
             }
+
             mLastLocation = location;
+
             for (LocationServiceListener mLocationServiceListener : mLocationServiceListeners) {
                 mLocationServiceListener.onLocationChanged(location);
             }

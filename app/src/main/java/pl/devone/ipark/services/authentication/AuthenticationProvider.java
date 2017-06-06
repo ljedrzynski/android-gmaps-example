@@ -22,9 +22,10 @@ import pl.devone.ipark.activities.helpers.CommonHelper;
  * Created by ljedrzynski on 17.05.2017.
  */
 
-public class AuthenticationManager {
+public class AuthenticationProvider {
 
     private static Gson gson = new Gson();
+    private static User user;
 
     public static void signIn(final Context context, final User user, final AsyncTaskCallback callback) {
         try {
@@ -82,7 +83,8 @@ public class AuthenticationManager {
     }
 
     public static void signOut(Activity currentActivity) {
-        PreferenceManager.getDefaultSharedPreferences(currentActivity.getApplicationContext())
+        PreferenceManager
+                .getDefaultSharedPreferences(currentActivity.getApplicationContext())
                 .edit()
                 .remove("user")
                 .apply();
@@ -91,8 +93,8 @@ public class AuthenticationManager {
     }
 
     public static User getUserFromContext(Context context) {
-        return gson.fromJson(PreferenceManager.getDefaultSharedPreferences(context)
-                .getString("user", ""), User.class);
+        return user != null ? user : (user = gson.fromJson(PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("user", ""), User.class));
     }
 
     public static boolean isAppAuthenticated(Context context) {

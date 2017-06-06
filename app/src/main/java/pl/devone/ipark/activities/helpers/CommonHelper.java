@@ -4,21 +4,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.util.Log;
 
 import pl.devone.ipark.R;
 import pl.devone.ipark.activities.LoginActivity;
 import pl.devone.ipark.models.User;
-import pl.devone.ipark.services.authentication.AuthenticationManager;
+import pl.devone.ipark.services.authentication.AuthenticationProvider;
 
 /**
  * Created by ljedrzynski on 17.05.2017.
  */
 
 public class CommonHelper {
-
-    private static User user;
 
     public static void navigateActivity(Context context, Class nextActivityClass, boolean finish) {
         if (context instanceof Activity & finish) {
@@ -61,6 +58,6 @@ public class CommonHelper {
     }
 
     public static User getUser(Context context) {
-        return user != null ? user : (user = AuthenticationManager.getUserFromContext(context));
+        return AuthenticationProvider.getUserFromContext(context);
     }
 }

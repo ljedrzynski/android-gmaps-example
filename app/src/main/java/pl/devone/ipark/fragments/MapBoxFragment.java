@@ -62,11 +62,7 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
 
     private MapBoxFragment.MapActionCallback mMapCallbacks;
     private MapBoxFragment.NavigationActionCallback mNavigationCallbacks;
-
-    /**
-     * Location access permission result listeners
-     */
-    private Set<PermissionResultListener> mPermissionResultListeners = new HashSet<>();
+    private MapBoxFragment.LocalPermissionResultCallback mLocPermissionResultCallbacks;
 
     //Navigation related
     private MapboxNavigation mNavigation;
@@ -91,12 +87,13 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             LocationProvider.LocationBinder binder = (LocationProvider.LocationBinder) service;
+
             mLocationProvider = binder.getService();
             mLocationProvider.registerListener(MapBoxFragment.this);
 
             mLastLocation = mLocationProvider.getLastLocation();
-
             setMapView();
+
             setNavigationEngine();
 
             setCameraPositionDefault();
@@ -114,15 +111,18 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mLocPermissionResultCallbacks = (MapBoxFragment.LocalPermissionResultCallback) context;
+        mMapCallbacks = (MapBoxFragment.MapActionCallback) getParentFragment();
+        mNavigationCallbacks = (MapBoxFragment.NavigationActionCallback) getParentFragment();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_token));
-
-        mMapCallbacks = (MapBoxFragment.MapActionCallback) getParentFragment();
-        mNavigationCallbacks = (MapBoxFragment.NavigationActionCallback) getParentFragment();
-
-        mPermissionResultListeners.add((PermissionResultListener) getActivity().getApplication());
 
         getContext().bindService(new Intent(getContext(), LocationProvider.class),
                 mLocationServiceConnection,
@@ -214,10 +214,10 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
             for (Marker marker : mParkingSpacesMap.keySet()) {
                 latLngs.add(marker.getPosition());
             }
-            MapHelper.moveCameraToBounds(mMapBoxMap, 300, 1000, latLngs);
+            MapHelper.cameraIncludePositions(mMapBoxMap, 300, 1000, latLngs);
 
         } else if (mLastLocation != null) {
-            MapHelper.moveCamera(mMapBoxMap, new LatLng(new LatLng(mLastLocation)), 16, 0, 45, 2000);
+            MapHelper.easeCamera(mMapBoxMap, new LatLng(new LatLng(mLastLocation)), 16, 0, 45, 2000);
         }
     }
 
@@ -269,9 +269,9 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         if (mNavigating) {
-            MapHelper.moveCamera(mMapBoxMap, new LatLng(location), 60, location.getBearing(), 60, 100);
+            MapHelper.easeCamera(mMapBoxMap, new LatLng(location), 60, location.getBearing(), 60, 100);
         } else {
-            MapHelper.moveCamera(mMapBoxMap, new LatLng(location), 16, mMapBoxMap.getCameraPosition().bearing, 45, 1000);
+            MapHelper.easeCamera(mMapBoxMap, new LatLng(location), 16, mMapBoxMap.getCameraPosition().bearing, 45, 1000);
         }
     }
 
@@ -295,6 +295,14 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mNavigationCallbacks = null;
+        mLocPermissionResultCallbacks = null;
+        mMapCallbacks = null;
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         mNavigation.onStop();
@@ -304,7 +312,6 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         mNavigation.removeAlertLevelChangeListener(this);
         mNavigation.removeNavigationEventListener(this);
         mNavigation.removeProgressChangeListener(this);
@@ -317,7 +324,6 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
         }
 
         mNavigation.endNavigation();
-        mMapCallbacks = null;
     }
 
     @Override
@@ -395,17 +401,17 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                 boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 if (!granted) {
                     PermissionHelper.requestLocationPermission(this);
-                    PermissionHelper.notifyListenersLocDenied(mPermissionResultListeners);
+                    mLocPermissionResultCallbacks.onDenied();
                     return;
                 }
-                PermissionHelper.notifyListenersLocGranted(mPermissionResultListeners);
+                mLocPermissionResultCallbacks.onGranted();
                 break;
             default:
                 // Ignored
         }
     }
 
-    public interface PermissionResultListener {
+    public interface LocalPermissionResultCallback {
 
         void onGranted();
 

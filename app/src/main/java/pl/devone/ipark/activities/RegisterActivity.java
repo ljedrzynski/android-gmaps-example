@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.devone.ipark.R;
-import pl.devone.ipark.services.authentication.AuthenticationManager;
+import pl.devone.ipark.services.authentication.AuthenticationProvider;
 import pl.devone.ipark.models.User;
 import pl.devone.ipark.activities.helpers.CommonHelper;
 import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
@@ -211,7 +211,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             focusView.requestFocus();
         } else {
             showProgress(true);
-            AuthenticationManager.signUp(this, new User(nick, email, password), new AsyncTaskCallback() {
+            AuthenticationProvider.signUp(this, new User(nick, email, password), new AsyncTaskCallback() {
                 @Override
                 public void onSuccess() {
                     showProgress(false);

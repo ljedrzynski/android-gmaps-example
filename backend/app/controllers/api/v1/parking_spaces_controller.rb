@@ -62,7 +62,7 @@ class Api::V1::ParkingSpacesController < ApplicationController
   # Only allow a trusted parameter "white list" through.
   def parking_space_params
     if params.has_key?(:address_info)
-      params[:address_info].force_encoding("ISO-8859-1").encode("UTF-8")
+      params[:address_info].force_encoding('ISO-8859-1').encode('UTF-8')
     end
     params.require(:parking_space).permit(:latitude, :longitude, :address_info, :occupied, :reporter_id, :curr_occupier_id, :last_occupier_id)
   end

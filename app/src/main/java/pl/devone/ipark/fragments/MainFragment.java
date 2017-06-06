@@ -63,14 +63,17 @@ public class MainFragment extends Fragment implements
         Fragment fragment;
         try {
             fragment = (Fragment) cls.getConstructor().newInstance();
+
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
+
         getChildFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
                 .replace(R.id.view_container, fragment)
                 .commitAllowingStateLoss();
+
         return fragment;
     }
 
@@ -85,7 +88,7 @@ public class MainFragment extends Fragment implements
             public void onRouteReady(DirectionsRoute route) {
                 mMapFragment.setRoute(route);
                 ((SearchViewFragment) getCurrentView()).setNavigationButtonVisibility(View.VISIBLE);
-                MapHelper.moveCameraToBounds(mMapFragment.getMap(), 300, 2000, mMapFragment.getRouteLine().getPoints());
+                MapHelper.cameraIncludePositions(mMapFragment.getMap(), 300, 2000, mMapFragment.getRouteLine().getPoints());
             }
         });
     }
@@ -123,8 +126,7 @@ public class MainFragment extends Fragment implements
         Location location = mMapFragment.getLastLocation();
         ParkingSpaceManager.createParkingSpace(
                 getContext(),
-                new ParkingSpace
-                        .ParkingSpaceBuilder(location.getLatitude(), location.getLongitude())
+                new ParkingSpace.Builder(location.getLatitude(), location.getLongitude())
                         .setOccupied(false)
                         .setLastOccupierId(CommonHelper.getUser(getContext()).getId())
                         .setReporterId(CommonHelper.getUser(getContext()).getId())
@@ -240,8 +242,9 @@ public class MainFragment extends Fragment implements
     @Override
     public void onMarkerClick(Marker marker) {
         mMapFragment.eraseRouteLine();
+
         if (LocationHelper.isLocationInRadius(new LatLng(mMapFragment.getLastLocation()), marker.getPosition(), 0.01)) {
-            MapHelper.moveCameraToBounds(mMapFragment.getMap(), 300, 2000, new LatLng(mMapFragment.getLastLocation()), marker.getPosition());
+            MapHelper.cameraIncludePositions(mMapFragment.getMap(), 300, 2000, new LatLng(mMapFragment.getLastLocation()), marker.getPosition());
             replaceView(ArrivedViewFragment.class);
 
         } else {
