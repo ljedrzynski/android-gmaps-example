@@ -22,7 +22,6 @@ import pl.devone.ipark.fragments.MainFragment;
 import pl.devone.ipark.fragments.MapBoxFragment;
 import pl.devone.ipark.fragments.NavigationDrawerFragment;
 import pl.devone.ipark.R;
-import pl.devone.ipark.services.activity.ActivityRecognitionHandler;
 import pl.devone.ipark.services.activity.ActivityRecognitionProvider;
 import pl.devone.ipark.services.authentication.AuthenticationProvider;
 import pl.devone.ipark.services.http.RestClient;
@@ -148,9 +147,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
         if (locationProvider != null) {
             stopService(locationProvider);
         }
-        if (activityRecognitionHandler != null) {
-            stopService(activityRecognitionHandler);
-        }
     }
 
     @Override
@@ -167,8 +163,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
     public void onConnected(@Nullable Bundle bundle) {
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, new Intent(this, ActivityRecognitionProvider.class), PendingIntent.FLAG_UPDATE_CURRENT);
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(mApiClient, 3000, pendingIntent);
-
-        startService(activityRecognitionHandler = new Intent(this, ActivityRecognitionHandler.class));
     }
 
     @Override

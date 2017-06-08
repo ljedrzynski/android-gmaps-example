@@ -92,11 +92,10 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
             mLocationProvider.registerListener(MapBoxFragment.this);
 
             mLastLocation = mLocationProvider.getLastLocation();
+
             setMapView();
 
             setNavigationEngine();
-
-            setCameraPositionDefault();
 
             mLocationServiceBound = true;
         }
@@ -165,6 +164,7 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                         return true;
                     }
                 });
+
                 mMapBoxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
@@ -172,14 +172,18 @@ public class MapBoxFragment extends Fragment implements NavigationEventListener,
                         mMapCallbacks.onMapClick(point);
                     }
                 });
+
                 mMapBoxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
                     @Override
                     public void onMapLongClick(@NonNull LatLng point) {
                         mMapCallbacks.onMapLongClick(point);
                     }
                 });
+
                 mMapBoxMap.setMyLocationEnabled(true);
                 mMapCallbacks.onMapReady();
+
+                setCameraPositionDefault();
             }
         });
 

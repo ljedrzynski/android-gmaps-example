@@ -3,17 +3,13 @@ package pl.devone.ipark.services.activity;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
+import android.content.IntentFilter;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import timber.log.Timber;
+import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -24,63 +20,48 @@ import timber.log.Timber;
  */
 public class ActivityRecognitionProvider extends IntentService {
 
-    private final IBinder mBinder = new ActivityRecognitionProvider.ActivityRecognitionBinder();
-    private Set<ActivityRecognitionProvider.ActivityRecognitionListener> mActivityRecognitionListeners = new HashSet<>();
+    private ActivityRecognitionHandler mActivityRecognitionHandler;
 
     public ActivityRecognitionProvider() {
         super("ActivityRecognitionProvider");
     }
 
-    /**
-     * Class used for the client Binder.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with IPC.
-     */
-    class ActivityRecognitionBinder extends Binder {
-        ActivityRecognitionProvider getService() {
-            return ActivityRecognitionProvider.this;
-        }
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-
-    @Override
     public void onCreate() {
+        mActivityRecognitionHandler = new ActivityRecognitionHandler();
         super.onCreate();
-
-        Timber.d(this.getClass().getSimpleName() + " has started");
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    public void registerListener(ActivityRecognitionListener activityRecognitionListener) {
-        if (!mActivityRecognitionListeners.contains(activityRecognitionListener)) {
-            mActivityRecognitionListeners.add(activityRecognitionListener);
-        }
-    }
-
-    public void removeListener(ActivityRecognitionListener activityRecognitionListener) {
-        mActivityRecognitionListeners.remove(activityRecognitionListener);
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        IntentFilter filter = new IntentFilter(ActivityRecognitionHandler.ACTIVITY_RECOGNITION_MSG);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(mActivityRecognitionHandler, filter);
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            for (ActivityRecognitionListener activityRecognitionListener : mActivityRecognitionListeners) {
-                activityRecognitionListener.onActivityDetected(result.getMostProbableActivity());
-            }
+            handleActivityResult(result.getProbableActivities());
         }
     }
 
-    interface ActivityRecognitionListener {
-
-        void onActivityDetected(DetectedActivity activity);
+    private void handleActivityResult(List<DetectedActivity> detectedActivities) {
+        for (DetectedActivity activity : detectedActivities) {
+            sendBroadcast(new Intent()
+                    .setAction(ActivityRecognitionHandler.ACTIVITY_RECOGNITION_MSG)
+                    .addCategory(Intent.CATEGORY_DEFAULT)
+                    .putExtra(ActivityRecognitionHandler.ACTIVITY_DETECTED, activity.getType())
+                    .putExtra(ActivityRecognitionHandler.ACTIVITY_CONFIDENCE, activity.getConfidence()));
+        }
     }
+
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(mActivityRecognitionHandler);
+        super.onDestroy();
+    }
+
 }

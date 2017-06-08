@@ -162,7 +162,7 @@ public class MainFragment extends Fragment implements
                 new AsyncTaskCallback() {
                     @Override
                     public void onSuccess() {
-                        CommonHelper.goBackground(getContext());
+                        getActivity().finish();
                     }
 
                     @Override

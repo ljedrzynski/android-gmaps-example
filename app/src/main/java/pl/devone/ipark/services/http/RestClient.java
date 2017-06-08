@@ -9,6 +9,7 @@ import com.loopj.android.http.ResponseHandlerInterface;
 
 import java.io.UnsupportedEncodingException;
 
+import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import pl.devone.ipark.services.http.helpers.HttpHelper;
 
@@ -28,7 +29,7 @@ public class RestClient {
     }
 
     public static void post(Context context, String url, String entity, ResponseHandlerInterface responseHandler) throws UnsupportedEncodingException {
-        client.post(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json", responseHandler);
+        client.post(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity, ContentType.APPLICATION_JSON), ContentType.APPLICATION_JSON.toString(), responseHandler);
     }
 
     public static void put(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
@@ -36,7 +37,7 @@ public class RestClient {
     }
 
     public static void put(Context context, String url, String entity, ResponseHandlerInterface responseHandler) throws UnsupportedEncodingException {
-        client.put(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity), "application/json", responseHandler);
+        client.put(context, HttpHelper.getApiAbsoluteUrl(context, url), new StringEntity(entity, ContentType.APPLICATION_JSON), ContentType.APPLICATION_JSON.toString(), responseHandler);
     }
 
     public static void delete(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {

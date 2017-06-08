@@ -25,7 +25,6 @@ import pl.devone.ipark.activities.helpers.CommonHelper;
 public class AuthenticationProvider {
 
     private static Gson gson = new Gson();
-    private static User user;
 
     public static void signIn(final Context context, final User user, final AsyncTaskCallback callback) {
         try {
@@ -93,8 +92,8 @@ public class AuthenticationProvider {
     }
 
     public static User getUserFromContext(Context context) {
-        return user != null ? user : (user = gson.fromJson(PreferenceManager.getDefaultSharedPreferences(context)
-                .getString("user", ""), User.class));
+        return gson.fromJson(PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("user", ""), User.class);
     }
 
     public static boolean isAppAuthenticated(Context context) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="api_url" type="string">http://10.0.2.2:3000</item>
+    <item name="api_url" type="string">https://ipark-app.herokuapp.com</item>
+    <!--<item name="api_url" type="string">http://10.0.2.2:3000</item>-->
     <item name="parking_spaces_url" type="string">/api/v1/parking-spaces</item>
     <item name="mapbox_token" type="string">pk.eyJ1IjoibGplZHJ6eW5za2kiLCJhIjoiY2ozM2RuY21uMDAwdDMycWs0Nmg3ZmlpYyJ9.IDMgCrV6l4YTvYvEd9N0Rg</item>
-
 </resources>

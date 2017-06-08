@@ -54,20 +54,22 @@
         </service>
 
         <service
-            android:name=".services.activity.ActivityRecognitionProvider"
-            android:exported="false">
-        </service>
-
-        <service
             android:name=".services.location.LocationProvider">
         </service>
 
         <service
-            android:name=".services.activity.ActivityRecognitionHandler">
+            android:name=".services.activity.ActivityRecognitionProvider">
         </service>
 
-        <!--<receiver android:name=".services.background.ActivityRecognitionProvider$ActionReceiver">-->
-        <!--</receiver>-->
+        <receiver
+            android:name=".services.activity.ActivityRecognitionHandler">
+        </receiver>
+
+        <receiver android:name=".services.activity.ActivityRecognitionHandler$NotificationActionHandler">
+            <intent-filter>
+                <action android:name="pl.ipark.intent.action.FREE_PARK_SPACE"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

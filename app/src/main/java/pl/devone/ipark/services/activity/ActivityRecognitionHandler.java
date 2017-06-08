@@ -1,199 +1,155 @@
 package pl.devone.ipark.services.activity;
 
-
-import android.app.Service;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.location.Location;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.v7.app.NotificationCompat;
+import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
 
-import pl.devone.ipark.services.location.LocationProvider;
-import timber.log.Timber;
+import java.util.List;
+
+import pl.devone.ipark.R;
+import pl.devone.ipark.activities.MainActivity;
+import pl.devone.ipark.activities.helpers.CommonHelper;
+import pl.devone.ipark.models.ParkingSpace;
+import pl.devone.ipark.services.callbacks.AsyncTaskCallback;
+import pl.devone.ipark.services.parkingspace.ParkingSpaceManager;
+import pl.devone.ipark.services.parkingspace.callbacks.ParkingSpaceFetchCallback;
+
 
 /**
  * Created by ljedrzynski on 03.06.2017.
  */
 
-public class ActivityRecognitionHandler extends Service implements LocationProvider.LocationServiceListener, ActivityRecognitionProvider.ActivityRecognitionListener {
+public class ActivityRecognitionHandler extends BroadcastReceiver {
 
-    private LocationProvider mLocationProvider;
-    private boolean mLocationProviderBound;
+    public static final String ACTIVITY_RECOGNITION_MSG = "pl.ipark.intent.action.MESSAGE_PROCESSED";
+    public static final String ACTIVITY_DETECTED = "pl.ipark.intent.params.ACTIVITY_DETECTED";
+    public static final String ACTIVITY_CONFIDENCE = "pl.ipark.intent.params.ACTIVITY_CONFIDENCE";
 
-    private ActivityRecognitionProvider mActivityProvider;
-    private boolean mActivityProviderBound;
+    private static final String FREE_PARK_SPACE_ACTION = "pl.ipark.intent.action.FREE_PARK_SPACE";
+    private static final String NONE_ACTION = "pl.ipark.intent.action.NONE";
+    private static final String OPEN_APP_ACTION = "pl.ipark.intent.action.OPEN_APP_ACTION";
 
-    private static String FREE_PARK_SPACE_ACTION = "FREE_PARK_SPACE_ACTION";
-    private static String OPEN_APP_ACTION = "OPEN_APP_ACTION";
-    private static String NONE_ACTION = "NONE_ACTION";
+    private static final String OCCUPIED_PARK_SPACE = "pl.ipark.intent.object.OCCUPIED_PARK_SPACE";
 
-    public static class ActionReceiver extends BroadcastReceiver {
+    private static boolean inVehicle;
 
-        public ActionReceiver() {
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.e("onReceive ", "");
-        }
-    }
-
-
-    private ServiceConnection mLocationProviderConnection = new ServiceConnection() {
+    public static class NotificationActionHandler extends BroadcastReceiver {
 
         @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            LocationProvider.LocationBinder binder = (LocationProvider.LocationBinder) service;
-            mLocationProvider = binder.getService();
-            mLocationProvider.registerListener(ActivityRecognitionHandler.this);
-            mLocationProviderBound = true;
-        }
+        public void onReceive(final Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case FREE_PARK_SPACE_ACTION: {
+                    ParkingSpace parkingSpace = ((ParkingSpace) intent.getSerializableExtra(OCCUPIED_PARK_SPACE))
+                            .setOccupied(false)
+                            .setLastOccupierId(CommonHelper.getUser(context).getId())
+                            .setCurrOccupierId(null);
 
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mLocationProviderBound = false;
-        }
-    };
+                    AsyncTaskCallback callback = new AsyncTaskCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(context, "Miejsce zostało udostępnione kolejnym użytkownikom! Dziękujemy!", Toast.LENGTH_LONG).show();
+                        }
 
-    private ServiceConnection mActivityProviderConnection = new ServiceConnection() {
+                        @Override
+                        public void onFailure() {
 
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            ActivityRecognitionProvider.ActivityRecognitionBinder binder = (ActivityRecognitionProvider.ActivityRecognitionBinder) service;
-            mActivityProvider = binder.getService();
-            mActivityProvider.registerListener(ActivityRecognitionHandler.this);
-            mActivityProviderBound = true;
-        }
+                        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mActivityProviderBound = false;
-        }
-    };
+                        @Override
+                        public void onError(String error) {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+                        }
+                    };
 
-        Intent intent = new Intent(this.getApplicationContext(), LocationProvider.class);
-        bindService(intent, mLocationProviderConnection, 0);
-
-        intent = new Intent(this.getApplicationContext(), ActivityRecognitionProvider.class);
-        bindService(intent, mActivityProviderConnection, 0);
-
-        Timber.d(this.getClass().getSimpleName() + " has started");
-    }
-
-
-    @Override
-    public void onActivityDetected(DetectedActivity activity) {
-        switch (activity.getType()) {
-            case DetectedActivity.IN_VEHICLE: {
-                Log.e("ActivityRecogition", "On Bicycle: " + activity.getConfidence());
+                    ParkingSpaceManager.updateParkingSpace(context, parkingSpace, callback);
+                }
                 break;
-            }
-            case DetectedActivity.ON_BICYCLE: {
-                Log.e("ActivityRecogition", "On Bicycle: " + activity.getConfidence());
-                break;
-            }
-            case DetectedActivity.ON_FOOT: {
-                Log.e("ActivityRecogition", "On Foot: " + activity.getConfidence());
-                break;
-            }
-            case DetectedActivity.RUNNING: {
-                Log.e("ActivityRecogition", "Running: " + activity.getConfidence());
-                break;
-            }
-            case DetectedActivity.STILL: {
-                Log.e("ActivityRecogition", "Still: " + activity.getConfidence() + " ");
-                if (activity.getConfidence() >= 75) {
-//                        ParkingSpaceManager.getUserParkingSpaces(getApplicationContext(), new ParkingSpaceFetchCallback() {
-//                            @Override
-//                            public void onSuccess(List<ParkingSpace> parkingSpaces) {
-//
-//                                if (parkingSpaces != null && parkingSpaces.size() == 1) {
-//                                    NotificationManager mNotificationManager = (NotificationManager)
-//                                            ActivityRecognitionHandler.this.getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//                                    NotificationCompat.Builder mBuilder =
-//                                            (NotificationCompat.Builder) new NotificationCompat.Builder(ActivityRecognitionHandler.this)
-//                                                    .setContentTitle("GCM Notification")
-//                                                    .setStyle(new NotificationCompat.BigTextStyle()
-//                                                            .bigText("Obecnie zajmujesz miejsce " + parkingSpaces.get(0).getLongitude() + "Czy chcesz je zwolnić?"))
-//                                                    .setContentText("TEST")
-//                                                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
-////                                        .addAction(new android.support.v4.app.NotificationCompat
-////                                                .Action(R.drawable.common_google_signin_btn_icon_dark_focused, "Zwolnij", contentIntent));
-//
-//                                    Intent freeSpaceIntent = new Intent(ActivityRecognitionHandler.this, ActionReceiver.class);
-//                                    freeSpaceIntent.putExtra("occupying_place", parkingSpaces.get(0));
-//                                    freeSpaceIntent.setAction(FREE_PARK_SPACE_ACTION);
-//                                    PendingIntent pendingFreeSpaceIntent = PendingIntent.getBroadcast(ActivityRecognitionHandler.this, 1000, freeSpaceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//                                    mBuilder.addAction(R.drawable.mapbox_marker_icon_default, "Zwolnij miejsce", pendingFreeSpaceIntent);
-//
-//                                    mNotificationManager.notify(0, mBuilder.build());
-//                                }
-//
-//
-//                            }
-//
-//                            @Override
-//                            public void onFailure() {
-//
-//                            }
-//                        });
+                case OPEN_APP_ACTION: {
+                    context.startActivity(new Intent(context, MainActivity.class));
                 }
                 break;
             }
-            case DetectedActivity.TILTING: {
-                Log.e("ActivityRecogition", "Tilting: " + activity.getConfidence());
-                break;
-            }
-            case DetectedActivity.WALKING: {
-                Log.e("ActivityRecogition", "Walking: " + activity.getConfidence());
-                break;
-            }
-            case DetectedActivity.UNKNOWN: {
-                Log.e("ActivityRecogition", "Unknown: " + activity.getConfidence());
-                break;
+            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(0);
+        }
+
+    }
+
+
+    public ActivityRecognitionHandler() {
+    }
+
+    @Override
+    public void onReceive(final Context context, Intent intent) {
+        int confidence = intent.getIntExtra(ACTIVITY_CONFIDENCE, -1);
+
+        if (confidence > 80) {
+            int activity = intent.getIntExtra(ACTIVITY_DETECTED, -1);
+
+            if (activity == DetectedActivity.IN_VEHICLE) {
+                if (!inVehicle) {
+                    showNotification(context);
+                }
+
+                inVehicle = true;
+
+            } else if (activity == DetectedActivity.ON_FOOT
+                    || activity == DetectedActivity.WALKING
+                    || activity == DetectedActivity.RUNNING
+                    || activity == DetectedActivity.ON_BICYCLE) {
+
+                inVehicle = false;
             }
         }
     }
 
+    private void showNotification(final Context context) {
+        ParkingSpaceManager.getUserParkingSpaces(context, new ParkingSpaceFetchCallback() {
+            @Override
+            public void onSuccess(List<ParkingSpace> parkingSpaces) {
+                if (parkingSpaces != null && parkingSpaces.size() > 0) {
+                    NotificationManager notificationManager = (NotificationManager) context
+                            .getSystemService(Context.NOTIFICATION_SERVICE);
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+                    NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                            .setContentTitle(context.getString(R.string.app_name))
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText("Obecnie zajmujesz miejsce " + parkingSpaces.get(0).getAddressInfo() + "Czy chcesz je zwolnić?"))
+                            .setContentText("TEST")
+                            .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+                    Intent freeSpaceIntent = new Intent(context, NotificationActionHandler.class)
+                            .setAction(FREE_PARK_SPACE_ACTION)
+                            .putExtra(OCCUPIED_PARK_SPACE, parkingSpaces.get(0));
 
-        if (mLocationProviderBound) {
-            unbindService(mLocationProviderConnection);
-            mLocationProvider.removeListener(this);
-            mLocationProviderBound = false;
-        }
+                    PendingIntent pendingFreeSpaceIntent = PendingIntent.getBroadcast(context, 1000, freeSpaceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    notificationBuilder.addAction(R.drawable.mapbox_marker_icon_default, "Zwolnij miejsce", pendingFreeSpaceIntent);
 
-        if (mActivityProviderBound) {
-            unbindService(mActivityProviderConnection);
-            mActivityProvider.removeListener(this);
-            mActivityProviderBound = false;
-        }
-    }
+                    Intent openAppIntent = new Intent(context, NotificationActionHandler.class)
+                            .setAction(OPEN_APP_ACTION);
 
-    @Override
-    public void onLocationChanged(Location location) {
+                    PendingIntent pendingOpenAppIntent = PendingIntent.getBroadcast(context, 1001, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    notificationBuilder.addAction(R.drawable.common_full_open_on_phone, "Przejdź do aplikacji", pendingOpenAppIntent);
 
+                    Intent noneIntent = new Intent(context, NotificationActionHandler.class)
+                            .setAction(NONE_ACTION);
+
+                    PendingIntent pendingNoneIntent = PendingIntent.getBroadcast(context, 1002, noneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    notificationBuilder.addAction(R.drawable.common_full_open_on_phone, "Jeszczę nie odjeżdzam", pendingNoneIntent);
+
+                    notificationManager.notify(0, notificationBuilder.build());
+                }
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
     }
 }
